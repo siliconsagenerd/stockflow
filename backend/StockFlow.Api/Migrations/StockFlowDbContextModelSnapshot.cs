@@ -41,6 +41,23 @@ namespace StockFlow.Api.Migrations
                     b.ToTable("DemoUsers");
                 });
 
+            modelBuilder.Entity("StockFlow.Api.Models.DemoWorkspace", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastAccessedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DemoWorkspaces");
+                });
+
             modelBuilder.Entity("StockFlow.Api.Models.GoodsReceipt", b =>
                 {
                     b.Property<Guid>("Id")
@@ -164,6 +181,9 @@ namespace StockFlow.Api.Migrations
                     b.Property<Guid?>("DecidedById")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Justification")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
@@ -177,6 +197,9 @@ namespace StockFlow.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("WorkspaceId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DecidedById");
@@ -184,6 +207,8 @@ namespace StockFlow.Api.Migrations
                     b.HasIndex("ProductId");
 
                     b.HasIndex("RequesterId");
+
+                    b.HasIndex("WorkspaceId");
 
                     b.ToTable("PurchaseRequests");
                 });
@@ -335,11 +360,19 @@ namespace StockFlow.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("StockFlow.Api.Models.DemoWorkspace", "Workspace")
+                        .WithMany()
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("DecidedBy");
 
                     b.Navigation("Product");
 
                     b.Navigation("Requester");
+
+                    b.Navigation("Workspace");
                 });
 
             modelBuilder.Entity("StockFlow.Api.Models.StockMovement", b =>

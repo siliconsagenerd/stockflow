@@ -14,6 +14,7 @@
       </nav>
     </header>
     <main class="app-main">
+      <DemoIdentitySwitcher />
       <ConnectivityBadge />
       <router-view />
     </main>
@@ -21,5 +22,12 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
 import ConnectivityBadge from "./components/ConnectivityBadge.vue";
+import DemoIdentitySwitcher from "./components/DemoIdentitySwitcher.vue";
+import { ensureWorkspace } from "./lib/api";
+
+onMounted(() => {
+  ensureWorkspace().catch(() => {});
+});
 </script>

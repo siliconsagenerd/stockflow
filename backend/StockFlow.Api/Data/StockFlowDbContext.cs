@@ -11,6 +11,7 @@ public class StockFlowDbContext : DbContext
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<DemoUser> DemoUsers => Set<DemoUser>();
+    public DbSet<DemoWorkspace> DemoWorkspaces => Set<DemoWorkspace>();
     public DbSet<PurchaseRequest> PurchaseRequests => Set<PurchaseRequest>();
     public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
     public DbSet<GoodsReceipt> GoodsReceipts => Set<GoodsReceipt>();
@@ -35,6 +36,8 @@ public class StockFlowDbContext : DbContext
             .HasForeignKey(p => p.PreferredSupplierId)
             .OnDelete(DeleteBehavior.SetNull);
 
+        modelBuilder.Entity<PurchaseRequest>()
+            .HasOne(r => r.Workspace).WithMany().HasForeignKey(r => r.WorkspaceId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<PurchaseRequest>()
             .HasOne(r => r.Product).WithMany().HasForeignKey(r => r.ProductId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<PurchaseRequest>()
