@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { apiFetch, ensureWorkspace } from "../lib/api";
+import { apiFetch, ensureSession } from "../lib/api";
 
 interface Product { id: string; sku: string; name: string; unit: string; currentStock: number; }
 interface RequestRow {
@@ -90,7 +90,7 @@ const form = ref<{ productId: string; quantity: number | null; justification: st
 
 onMounted(async () => {
   try {
-    await ensureWorkspace();
+    await ensureSession();
     await loadProducts();
     await loadRequests();
   } catch (e) {

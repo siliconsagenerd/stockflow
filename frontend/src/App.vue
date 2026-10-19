@@ -25,9 +25,9 @@
 import { onMounted } from "vue";
 import ConnectivityBadge from "./components/ConnectivityBadge.vue";
 import DemoIdentitySwitcher from "./components/DemoIdentitySwitcher.vue";
-import { ensureWorkspace } from "./lib/api";
+import { ensureSession } from "./lib/api";
 
 onMounted(() => {
-  ensureWorkspace().catch(() => {});
+  ensureSession().catch(() => {});
 });
 </script>

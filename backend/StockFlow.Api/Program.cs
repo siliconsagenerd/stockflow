@@ -14,7 +14,7 @@ var connectionString =
     ?? "Host=localhost;Port=5432;Database=stockflow;Username=stockflow;Password=CHANGEME";
 
 builder.Services.AddDbContext<StockFlowDbContext>(opt =>
-    opt.UseNpgsql(connectionString));
+    opt.UseNpgsql(connectionString, npg => npg.MigrationsAssembly("StockFlow.Api")));
 
 var app = builder.Build();
 

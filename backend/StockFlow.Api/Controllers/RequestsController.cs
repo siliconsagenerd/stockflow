@@ -16,15 +16,19 @@ public class RequestsController : ControllerBase
 
     public RequestsController(StockFlowDbContext db) => _db = db;
 
+    private async Task<(DemoSession? Session, IActionResult? Error)> ResolveSessionAsync()
+    {
+        var session = await SessionContext.ResolveAsync(_db, HttpContext);
+        if (session is null) return (null, Unauthorized(new { error = "No valid session." }));
+        return (session, null);
+    }
+
     [HttpGet]
     public async Task<IActionResult> List()
     {
-        Guid wsId;
-        try { wsId = DemoContext.ResolveWorkspaceId(HttpContext); }
-        catch (DemoContextException e) { return BadRequest(new { error = e.Message }); }
-
-        if (!await _db.DemoWorkspaces.AnyAsync(w => w.Id == wsId))
-            return BadRequest(new { error = "Demo workspace not found." });
+        var (session, err) = await ResolveSessionAsync();
+        if (err is not null) return err;
+        var wsId = session!.WorkspaceId;
 
         var items = await _db.PurchaseRequests
             .Where(r => r.WorkspaceId == wsId)
@@ -41,9 +45,9 @@ public class RequestsController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> Get(Guid id)
     {
-        Guid wsId;
-        try { wsId = DemoContext.ResolveWorkspaceId(HttpContext); }
-        catch (DemoContextException e) { return BadRequest(new { error = e.Message }); }
+        var (session, err) = await ResolveSessionAsync();
+        if (err is not null) return err;
+        var wsId = session!.WorkspaceId;
 
         var r = await _db.PurchaseRequests
             .Where(x => x.Id == id && x.WorkspaceId == wsId)
@@ -60,14 +64,12 @@ public class RequestsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateRequestDto dto)
     {
-        Guid wsId;
+        var (session, err) = await ResolveSessionAsync();
+        if (err is not null) return err;
+        var wsId = session!.WorkspaceId;
+
         DemoUser requester;
-        try
-        {
-            var ws = await DemoContext.ResolveWorkspaceAsync(_db, HttpContext);
-            wsId = ws.Id;
-            requester = await DemoContext.ResolveUserAsync(_db, HttpContext);
-        }
+        try { requester = await DemoContext.ResolveUserAsync(_db, HttpContext); }
         catch (DemoContextException e) { return BadRequest(new { error = e.Message }); }
 
         if (dto.Quantity < 1)
@@ -77,8 +79,7 @@ public class RequestsController : ControllerBase
             return BadRequest(new { error = $"Justification must be at most {MaxJustification} characters." });
 
         var product = await _db.Products.FindAsync(dto.ProductId);
-        if (product is null)
-            return BadRequest(new { error = "Unknown product." });
+        if (product is null) return BadRequest(new { error = "Unknown product." });
 
         var entity = new PurchaseRequest
         {
