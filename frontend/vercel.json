@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://stockflowap1.duckdns.org/api/:path*" },
+    { "source": "/health", "destination": "https://stockflowap1.duckdns.org/health" }
+  ]
+}
