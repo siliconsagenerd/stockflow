@@ -39,8 +39,13 @@ ssh -i ~/.ssh/oci_stockflow ubuntu@138.3.249.173 "sudo docker logs -f stockflow-
 
 ## Redeploy Same Version
 ```bash
-# On OCI instance:
+# 1. Sync source from oldmac (OCI dir is NOT a git repo — git pull fails there)
+cd ~/projects/stockflow && tar czf - backend Dockerfile | \
+  ssh -i ~/.ssh/oci_stockflow ubuntu@138.3.249.173 "cd /home/ubuntu/stockflow && tar xzf -"
+
+# 2. On OCI instance:
 ssh -i ~/.ssh/oci_stockflow ubuntu@138.3.249.173
+cd /home/ubuntu/stockflow && sudo docker build -q -t stockflow-api:latest .
 sudo docker stop stockflow-api && sudo docker rm stockflow-api
 sudo docker run -d --name stockflow-api --restart unless-stopped \
   --env-file /home/ubuntu/stockflow.env \
