@@ -1,32 +1,32 @@
 <template>
   <section>
-    <h1>Requests</h1>
-    <p class="muted">Create material requests. Each is persisted as Pending for the current demo workspace.</p>
+    <h1>{{ t("nav.requests") }}</h1>
+    <p class="muted">Materialanfragen erstellen. Jede wird als Ausstehend für den aktuellen Demo-Workspace gespeichert.</p>
 
     <div class="card">
-      <h2>New request</h2>
+      <h2>Neue Anfrage</h2>
       <form @submit.prevent="submit" novalidate>
         <div class="field">
-          <label for="product">Product</label>
+          <label for="product">Produkt</label>
           <select id="product" v-model="form.productId" required>
-            <option value="" disabled>Select a product…</option>
+            <option value="" disabled>Produkt auswählen…</option>
             <option v-for="p in products" :key="p.id" :value="p.id">
               {{ p.name }} ({{ p.sku }}) — {{ p.unit }}
             </option>
           </select>
         </div>
         <div class="field">
-          <label for="qty">Quantity</label>
+          <label for="qty">Menge</label>
           <input id="qty" type="number" min="1" step="1" v-model.number="form.quantity" required />
         </div>
         <div class="field">
-          <label for="just">Justification (optional)</label>
+          <label for="just">Begründung (optional)</label>
           <textarea id="just" v-model="form.justification" maxlength="500" rows="3"></textarea>
           <span class="muted">{{ (form.justification || "").length }}/500</span>
         </div>
         <div class="actions">
           <button type="submit" :disabled="submitting">
-            {{ submitting ? "Submitting…" : "Submit request" }}
+            {{ submitting ? "Wird gesendet…" : "Anfrage absenden" }}
           </button>
           <span v-if="successMsg" class="status-badge status-success" role="status">{{ successMsg }}</span>
           <span v-if="errorMsg" class="status-badge status-danger" role="alert">{{ errorMsg }}</span>
@@ -35,9 +35,9 @@
     </div>
 
     <div class="card">
-      <h2>Requests in this workspace</h2>
-      <p v-if="loading" class="muted">Loading…</p>
-      <p v-else-if="requests.length === 0" class="muted">No requests yet.</p>
+      <h2>Anfragen in diesem Workspace</h2>
+      <p v-if="loading" class="muted">Laden…</p>
+      <p v-else-if="requests.length === 0" class="muted">Noch keine Anfragen.</p>
       <table v-else class="table">
         <thead>
           <tr>
@@ -65,6 +65,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useI18n } from "../lib/i18n";
 import { apiFetch, ensureSession } from "../lib/api";
 
 interface Product { id: string; sku: string; name: string; unit: string; currentStock: number; }
@@ -79,6 +80,7 @@ const requests = ref<RequestRow[]>([]);
 const loading = ref(true);
 const listError = ref("");
 const submitting = ref(false);
+const { t } = useI18n();
 const successMsg = ref("");
 const errorMsg = ref("");
 

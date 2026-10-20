@@ -1,21 +1,20 @@
 <template>
   <div class="card" style="margin-bottom:0.5rem;">
-    <strong>Demo identity</strong>
-    <span class="muted"> — simulated, not secure authentication.</span>
+    <strong>{{ t("identity.label") }}</strong>
+    <span class="muted"> — {{ t("identity.hint") }}.</span>
     <select v-model="selected" @change="onChange" style="margin-left:0.5rem;">
       <option v-for="u in users" :key="u.id" :value="u.id">{{ u.displayName }} ({{ u.role }})</option>
     </select>
   </div>
 </template>
-
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { apiFetch, getDemoUserId, setDemoUserId } from "../lib/api";
-
+import { useI18n } from "../lib/i18n";
+const { t } = useI18n();
 interface DemoUser { id: string; displayName: string; role: string; }
 const users = ref<DemoUser[]>([]);
 const selected = ref("");
-
 onMounted(async () => {
   try {
     const res = await apiFetch("/api/demo-users");
@@ -32,7 +31,6 @@ onMounted(async () => {
     }
   } catch { /* ignore */ }
 });
-
 function onChange() {
   setDemoUserId(selected.value);
 }

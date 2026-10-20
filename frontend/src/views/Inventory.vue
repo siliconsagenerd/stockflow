@@ -1,15 +1,15 @@
 <template>
   <section>
-    <h1>Inventory</h1>
-    <p class="muted">Workspace-specific stock balances and movement history.</p>
+    <h1>{{ t("nav.inventory") }}</h1>
+    <p class="muted">Workspace-spezifische Bestände und Bewegungshistorie.</p>
 
     <div class="card">
-      <h2>Balances</h2>
-      <p v-if="loading" class="muted">Loading…</p>
-      <p v-else-if="balances.length === 0" class="muted">No stock balances yet.</p>
+      <h2>Bestände</h2>
+      <p v-if="loading" class="muted">Laden…</p>
+      <p v-else-if="balances.length === 0" class="muted">Noch keine Bestände.</p>
       <table v-else class="table">
         <thead>
-          <tr><th>Product</th><th>Warehouse</th><th>Quantity</th></tr>
+          <tr><th>Produkt</th><th>Lager</th><th>Menge</th></tr>
         </thead>
         <tbody>
           <tr v-for="b in balances" :key="b.productId + b.warehouseId">
@@ -22,11 +22,11 @@
     </div>
 
     <div class="card">
-      <h2>Movement history</h2>
-      <p v-if="movements.length === 0" class="muted">No movements yet.</p>
+      <h2>Bewegungshistorie</h2>
+      <p v-if="movements.length === 0" class="muted">Noch keine Bewegungen.</p>
       <table v-else class="table">
         <thead>
-          <tr><th>Time</th><th>Product</th><th>Delta</th><th>Reason</th><th>Reference</th></tr>
+          <tr><th>Time</th><th>Produkt</th><th>Delta</th><th>Reason</th><th>Reference</th></tr>
         </thead>
         <tbody>
           <tr v-for="m in movements" :key="m.id">
@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useI18n } from "../lib/i18n";
 import { apiFetch, ensureSession } from "../lib/api";
 
 interface Balance { productId: string; productName: string; productSku: string; productUnit: string; warehouseId: string; warehouseName: string; quantity: number; }
@@ -53,6 +54,7 @@ interface Movement { id: string; productId: string; productName: string; warehou
 const balances = ref<Balance[]>([]);
 const movements = ref<Movement[]>([]);
 const loading = ref(true);
+const { t } = useI18n();
 const error = ref("");
 
 onMounted(async () => {

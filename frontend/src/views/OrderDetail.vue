@@ -1,36 +1,36 @@
 <template>
   <section>
-    <p><router-link to="/orders">← Back to orders</router-link></p>
+    <p><router-link to="/orders">← Zurück zu Bestellungen</router-link></p>
     <h1>Purchase Order {{ order?.reference }}</h1>
-    <p v-if="loading" class="muted">Loading…</p>
+    <p v-if="loading" class="muted">Laden…</p>
     <p v-if="error" class="status-badge status-danger">{{ error }}</p>
 
     <div v-if="order" class="card">
-      <div>Product: <strong>{{ order.productName }}</strong> ({{ order.productSku }})</div>
-      <div>Supplier: {{ order.supplierName }}</div>
-      <div>Warehouse: {{ order.warehouseName }}</div>
-      <div>Ordered: {{ order.orderedQuantity }}</div>
-      <div>Received: {{ order.receivedQuantity }}</div>
-      <div>Outstanding: {{ order.orderedQuantity - order.receivedQuantity }}</div>
+      <div>Produkt: <strong>{{ order.productName }}</strong> ({{ order.productSku }})</div>
+      <div>Lieferant: {{ order.supplierName }}</div>
+      <div>Lager: {{ order.warehouseName }}</div>
+      <div>Bestellt: {{ order.orderedQuantity }}</div>
+      <div>Empfangen: {{ order.receivedQuantity }}</div>
+      <div>Ausstehend: {{ order.orderedQuantity - order.receivedQuantity }}</div>
       <div>Status: <span class="status-badge status-pending">{{ order.status }}</span></div>
-      <div>Created: {{ new Date(order.createdAt).toLocaleString() }}</div>
+      <div>Erstellt: {{ new Date(order.createdAt).toLocaleString() }}</div>
     </div>
 
     <div v-if="order && order.status !== 'Completed'" class="card">
-      <h2>Receive goods</h2>
-      <label>Quantity to receive</label>
+      <h2>Wareneingang</h2>
+      <label>Menge empfangen</label>
       <input v-model.number="qty" type="number" min="1" />
       <div class="actions">
-        <button :disabled="busy" @click="receive">Receive</button>
+        <button :disabled="busy" @click="receive">Empfangen</button>
       </div>
       <p v-if="msg" class="status-badge" :class="msgOk ? 'status-success' : 'status-danger'">{{ msg }}</p>
     </div>
 
     <div class="card">
-      <h2>Receipt history</h2>
-      <p v-if="receipts.length === 0" class="muted">No receipts yet.</p>
+      <h2>Wareneingangshistorie</h2>
+      <p v-if="receipts.length === 0" class="muted">Noch keine Wareneingänge.</p>
       <table v-else class="table">
-        <thead><tr><th>Time</th><th>Qty</th><th>Actor</th><th>Idempotency key</th></tr></thead>
+        <thead><tr><th>Zeit</th><th>Menge</th><th>Benutzer</th><th>Idempotenzschlüssel</th></tr></thead>
         <tbody>
           <tr v-for="r in receipts" :key="r.id">
             <td>{{ new Date(r.receivedAt).toLocaleString() }}</td>
@@ -50,7 +50,7 @@ import { useRoute } from "vue-router";
 import { apiFetch, ensureSession } from "../lib/api";
 
 interface Order { id: string; reference: string; purchaseRequestId: string; supplierId: string; supplierName: string; warehouseId: string; warehouseName: string; productId: string; productName: string; productSku: string; orderedQuantity: number; receivedQuantity: number; status: string; createdAt: string; }
-interface Receipt { id: string; purchaseOrderId: string; workspaceId: string; quantity: number; receivedById: string; receivedByName: string; receivedAt: string; idempotencyKey: string; orderReceivedQuantity: number; orderStatus: string; }
+interface Receipt { id: string; purchaseOrderId: string; workspaceId: string; quantity: number; receivedById: string; receivedByName: string; receivedAt: string; idempotencyKey: string; orderEmpfangendQuantity: number; orderStatus: string; }
 
 const route = useRoute();
 const order = ref<Order | null>(null);
@@ -100,7 +100,7 @@ async function receive() {
       msgOk.value = false;
       return;
     }
-    msg.value = "Received";
+    msg.value = "Empfangend";
     msgOk.value = true;
     // update order + generate new key for next receipt
     await load();

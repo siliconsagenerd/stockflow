@@ -1,20 +1,20 @@
 <template>
   <section>
-    <h1>Purchase Orders</h1>
-    <p class="muted">Orders created from approved requests in this workspace.</p>
+    <h1>{{ t("nav.orders") }}</h1>
+    <p class="muted">Bestellungen aus freigegebenen Anfragen in diesem Workspace.</p>
 
     <div class="card">
-      <p v-if="loading" class="muted">Loading…</p>
-      <p v-else-if="orders.length === 0" class="muted">No purchase orders yet.</p>
+      <p v-if="loading" class="muted">Laden…</p>
+      <p v-else-if="orders.length === 0" class="muted">Noch keine Bestellungen.</p>
       <table v-else class="table">
         <thead>
           <tr>
-            <th>Reference</th>
-            <th>Product</th>
-            <th>Supplier</th>
-            <th>Qty</th>
+            <th>Referenz</th>
+            <th>Produkt</th>
+            <th>Lieferant</th>
+            <th>Menge</th>
             <th>Status</th>
-            <th>Created</th>
+            <th>Erstellt</th>
           </tr>
         </thead>
         <tbody>
@@ -35,12 +35,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useI18n } from "../lib/i18n";
 import { apiFetch, ensureSession } from "../lib/api";
 
 interface OrderRow { id: string; reference: string; purchaseRequestId: string; supplierId: string; supplierName: string; warehouseId: string; warehouseName: string; productId: string; productName: string; productSku: string; orderedQuantity: number; receivedQuantity: number; status: string; createdAt: string; }
 
 const orders = ref<OrderRow[]>([]);
 const loading = ref(true);
+const { t } = useI18n();
 const error = ref("");
 
 onMounted(async () => {

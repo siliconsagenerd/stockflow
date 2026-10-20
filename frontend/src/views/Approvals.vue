@@ -1,27 +1,27 @@
 <template>
   <section>
-    <h1>Approvals</h1>
-    <p class="muted">Pending requests in this workspace. Only a Manager demo identity can decide.</p>
-    <p v-if="!isManager" class="status-badge status-warning">Switch to a Manager identity to approve or reject.</p>
+    <h1>{{ t("nav.approvals") }}</h1>
+    <p class="muted">Ausstehende Anfragen in diesem Workspace. Nur eine Manager-Demo-Identität kann entscheiden.</p>
+    <p v-if="!isManager" class="status-badge status-warning">Zu einer Manager-Identität wechseln, um freizugeben oder abzulehnen.</p>
 
     <div class="card">
-      <p v-if="loading" class="muted">Loading…</p>
-      <p v-else-if="pending.length === 0" class="muted">No pending requests.</p>
+      <p v-if="loading" class="muted">Laden…</p>
+      <p v-else-if="pending.length === 0" class="muted">Keine ausstehenden Anfragen.</p>
       <div v-else v-for="r in pending" :key="r.id" class="card" style="margin-bottom:0.75rem;">
         <strong>{{ r.productName }}</strong> <span class="muted">({{ r.productSku }})</span>
-        <div>Qty: {{ r.quantity }} {{ r.productUnit }}</div>
-        <div>Requester: {{ r.requesterName }}</div>
-        <div>Created: {{ new Date(r.createdAt).toLocaleString() }}</div>
-        <div v-if="r.justification" class="muted">Justification: {{ r.justification }}</div>
+        <div>Menge: {{ r.quantity }} {{ r.productUnit }}</div>
+        <div>Anfragender: {{ r.requesterName }}</div>
+        <div>Erstellt: {{ new Date(r.createdAt).toLocaleString() }}</div>
+        <div v-if="r.justification" class="muted">Begründung: {{ r.justification }}</div>
         <div class="actions" style="margin-top:0.5rem;">
-          <button v-if="isManager" :disabled="busy" @click="decide(r.id, 'approve')">Approve</button>
-          <button v-if="isManager" class="secondary" :disabled="busy" @click="openReject(r.id)">Reject</button>
+          <button v-if="isManager" :disabled="busy" @click="decide(r.id, 'approve')">Freigeben</button>
+          <button v-if="isManager" class="secondary" :disabled="busy" @click="openAblehnen(r.id)">Ablehnen</button>
         </div>
         <div v-if="rejecting === r.id" style="margin-top:0.5rem;">
-          <textarea v-model="rejectReason" rows="2" placeholder="Reason (optional)" maxlength="500"></textarea>
+          <textarea v-model="rejectReason" rows="2" placeholder="Grund (optional)" maxlength="500"></textarea>
           <div class="actions">
-            <button :disabled="busy" @click="decide(r.id, 'reject')">Confirm reject</button>
-            <button class="secondary" @click="rejecting = null">Cancel</button>
+            <button :disabled="busy" @click="decide(r.id, 'reject')">Ablehnung bestätigen</button>
+            <button class="secondary" @click="rejecting = null">Abbrechen</button>
           </div>
         </div>
         <span v-if="msg[r.id]" class="status-badge" :class="msg[r.id].ok ? 'status-success' : 'status-danger'">{{ msg[r.id].text }}</span>
@@ -33,6 +33,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
+import { useI18n } from "../lib/i18n";
 import { apiFetch, ensureSession, getDemoUserId } from "../lib/api";
 
 interface RequestRow { id: string; productId: string; productName: string; productSku: string; productUnit: string; quantity: number; justification?: string | null; status: string; requesterId: string; requesterName: string; createdAt: string; workspaceId: string; }
@@ -42,6 +43,7 @@ const requests = ref<RequestRow[]>([]);
 const users = ref<DemoUser[]>([]);
 const loading = ref(true);
 const busy = ref(false);
+const { t } = useI18n();
 const error = ref("");
 const rejecting = ref<string | null>(null);
 const rejectReason = ref("");
@@ -71,7 +73,7 @@ async function load() {
   if (ures.ok) users.value = await ures.json();
 }
 
-function openReject(id: string) { rejecting.value = id; rejectReason.value = ""; }
+function openAblehnen(id: string) { rejecting.value = id; rejectReason.value = ""; }
 
 async function decide(id: string, action: "approve" | "reject") {
   busy.value = true;
@@ -84,7 +86,7 @@ async function decide(id: string, action: "approve" | "reject") {
       msg.value[id] = { text: (data && data.error) || `Failed (HTTP ${res.status})`, ok: false };
       return;
     }
-    msg.value[id] = { text: action === "approve" ? "Approved" : "Rejected", ok: true };
+    msg.value[id] = { text: action === "approve" ? "Freigebend" : "Ablehnened", ok: true };
     rejecting.value = null;
     await load();
   } catch (e) {
