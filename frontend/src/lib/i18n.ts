@@ -9,6 +9,30 @@ export function useI18n() {
     const dict = locale.value === "de" ? de : en;
     return dict[key] ?? key;
   };
+  // Map known backend error strings to German (passes through unknown strings)
+  const apiErrors: Record<string, string> = {
+    "Self-approval is not allowed.": "Selbstfreigabe nicht erlaubt: Diese Anfrage wurde von Ihnen erstellt. Eine andere Manager-Identität muss entscheiden (Vier-Augen-Prinzip).",
+    "Self-rejection is not allowed.": "Selbstentscheidung nicht erlaubt: Diese Anfrage wurde von Ihnen erstellt. Eine andere Manager-Identität muss entscheiden (Vier-Augen-Prinzip).",
+    "Only a Manager demo identity can approve.": "Nur eine Manager-Demo-Identität darf freigeben.",
+    "Only a Manager demo identity can reject.": "Nur eine Manager-Demo-Identität darf ablehnen.",
+    "Only a Warehouse demo identity can receive goods.": "Nur eine Warehouse-Demo-Identität darf Wareneingang buchen.",
+    "Quantity must be a positive whole number.": "Menge muss eine positive ganze Zahl sein.",
+    "Idempotency key conflict: different order or quantity.": "Idempotenzschlüssel-Konflikt: Anderer Auftrag oder Menge.",
+    "Concurrent conflict or idempotency key conflict.": "Gleichzeitiger Konflikt – bitte erneut versuchen.",
+    "Concurrent conflict; retry.": "Gleichzeitiger Konflikt – bitte erneut versuchen.",
+    "Idempotency key is required.": "Idempotenzschlüssel erforderlich.",
+    "Order already exists for this request.": "Für diese Anfrage existiert bereits eine Bestellung.",
+    "Order is already completed.": "Bestellung ist bereits abgeschlossen.",
+    "Purchase order not found.": "Bestellung nicht gefunden.",
+    "Request is no longer Pending.": "Anfrage ist nicht mehr ausstehend.",
+    "Request not found.": "Anfrage nicht gefunden.",
+    "Unknown product.": "Unbekanntes Produkt.",
+    "No supplier/warehouse configured.": "Kein Lieferant/Lager konfiguriert.",
+    "No valid session.": "Keine gültige Sitzung.",
+    "Workspace not found.": "Workspace nicht gefunden.",
+  };
+  const tApi = (msg: string): string =>
+    locale.value === "de" ? (apiErrors[msg] ?? msg) : msg;
   // translate backend status values; falls back to raw value
   const tStatus = (status: string): string => t("status." + status);
   const setLocale = (l: Locale) => {
@@ -16,7 +40,7 @@ export function useI18n() {
     localStorage.setItem("stockflow.locale", l);
   };
   const toggle = () => setLocale(locale.value === "de" ? "en" : "de");
-  return { locale, t, tStatus, setLocale, toggle };
+  return { locale, t, tStatus, tApi, setLocale, toggle };
 }
 
 const de: Record<string, string> = {

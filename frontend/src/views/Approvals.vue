@@ -12,11 +12,12 @@
         <strong>{{ r.productName }}</strong> <span class="muted">({{ r.productSku }})</span>
         <div>Menge: {{ r.quantity }} {{ r.productUnit }}</div>
         <div>Anfragender: {{ r.requesterName }}</div>
+        <p v-if="r.requesterId === selectedId" class="muted" style="margin-top:0.25rem;">Ihre eigene Anfrage – Vier-Augen-Prinzip: Eine andere Manager-Identität muss entscheiden. Sie können nicht selbst freigeben oder ablehnen.</p>
         <div>Erstellt: {{ new Date(r.createdAt).toLocaleString() }}</div>
         <div v-if="r.justification" class="muted">Begründung: {{ r.justification }}</div>
         <div class="actions" style="margin-top:0.5rem;">
-          <button v-if="isManager" :disabled="busy" @click="decide(r.id, 'approve')">Freigeben</button>
-          <button v-if="isManager" class="secondary" :disabled="busy" @click="openReject(r.id)">Ablehnen</button>
+          <button v-if="isManager" :disabled="busy || r.requesterId === selectedId" @click="decide(r.id, 'approve')">Freigeben</button>
+          <button v-if="isManager" class="secondary" :disabled="busy || r.requesterId === selectedId" @click="openReject(r.id)">Ablehnen</button>
         </div>
         <div v-if="rejecting === r.id" style="margin-top:0.5rem;">
           <textarea v-model="rejectReason" rows="2" placeholder="Grund (optional)" maxlength="500"></textarea>
@@ -44,7 +45,7 @@ const requests = ref<RequestRow[]>([]);
 const users = ref<DemoUser[]>([]);
 const loading = ref(true);
 const busy = ref(false);
-const { t } = useI18n();
+const { t, tApi } = useI18n();
 const error = ref("");
 const rejecting = ref<string | null>(null);
 const rejectReason = ref("");
@@ -85,7 +86,7 @@ async function decide(id: string, action: "approve" | "reject") {
     const res = await apiFetch(`/api/requests/${id}/${action}`, { method: "POST", body: JSON.stringify(body) });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      msg.value[id] = { text: (data && data.error) || `Fehler (HTTP ${res.status})`, ok: false };
+      msg.value[id] = { text: tApi((data && data.error) || `Fehler (HTTP ${res.status})`), ok: false };
       return;
     }
     msg.value[id] = { text: action === "approve" ? "Freigeben erfolgreich" : "Abgelehnt", ok: true };

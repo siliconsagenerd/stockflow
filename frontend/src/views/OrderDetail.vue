@@ -59,7 +59,7 @@ const receipts = ref<Receipt[]>([]);
 const loading = ref(true);
 const error = ref("");
 const qty = ref(1);
-const { tStatus } = useI18n();
+const { tStatus, tApi } = useI18n();
 const busy = ref(false);
 const msg = ref("");
 const msgOk = ref(true);
@@ -97,9 +97,9 @@ async function receive() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       if (res.status === 409) {
-        msg.value = (data && data.error) || "Konflikt – bitte erneut versuchen.";
+        msg.value = tApi((data && data.error) || "Konflikt – bitte erneut versuchen.");
       } else {
-        msg.value = (data && data.error) || ("Fehler (HTTP " + res.status + ")");
+        msg.value = tApi((data && data.error) || ("Fehler (HTTP " + res.status + ")"));
       }
       msgOk.value = false;
       return;

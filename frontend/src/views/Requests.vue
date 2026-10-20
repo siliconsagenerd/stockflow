@@ -80,7 +80,7 @@ const requests = ref<RequestRow[]>([]);
 const loading = ref(true);
 const listError = ref("");
 const submitting = ref(false);
-const { t, tStatus } = useI18n();
+const { t, tStatus, tApi } = useI18n();
 const successMsg = ref("");
 const errorMsg = ref("");
 
@@ -131,7 +131,7 @@ async function submit() {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      errorMsg.value = (data && data.error) || `Request failed (HTTP ${res.status})`;
+      errorMsg.value = tApi((data && data.error) || `Request failed (HTTP ${res.status})`);
       return;
     }
     successMsg.value = `Anfrage erstellt (${String(data.id).slice(0, 8)}…)`;
