@@ -6,7 +6,9 @@
 - **Health check**: https://stockflowap1.duckdns.org/health
 
 ## Deployment Details
-- **Image tag**: stockflow-api:latest (built from HEAD bdb999c)
+- **Current deployed HEAD**: 6316a4ea5af75294121183bdc44fa8652fb27c63
+- **API image built from**: bdb999c (docs-only changes since; API image unchanged)
+- **Image tag**: stockflow-api:latest
 - **Deployment date**: 2026-10-20
 - **Frontend**: Vercel (hobby plan)
 - **API host**: Oracle Cloud (eu-frankfurt-1, VM.Standard.A1.Flex)
@@ -85,6 +87,16 @@ sudo docker run -d --name stockflow-api --restart unless-stopped \
   9. Verify health check
   10. Database stays Supabase (no migration needed)
   11. No application code changes required
+
+## Load Test Result
+
+- 8 concurrent users, each completing request -> approval -> receipt (6 + 4)
+- 8/8 workspaces, requests, approvals, and purchase orders succeeded
+- Inventory correct (10 units) for 5 of 8 concurrent users
+- 3 serialization conflicts (HTTP 409) on concurrent receipt submissions
+- Concurrent receipt submissions may return retryable 409 responses
+- The demo is verified for sequential use
+- Do not claim the concurrent load test fully passed
 
 ## Connection Mode
 - **Mode**: Supavisor transaction pooler (port 6543)

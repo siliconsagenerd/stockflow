@@ -158,6 +158,18 @@ authentication. Workspace access is anonymous and possession-based via a cookie.
 - Supabase free tier (7-day backup retention, 500MB limit).
 - Oracle Cloud free tier (short-lived deployment).
 
+
+### Load Test Result (8 concurrent users)
+
+- 8/8 workspaces created successfully
+- 8/8 requests submitted and approved
+- 8/8 purchase orders created (no duplicates)
+- Inventory correct (10 units) for 5 of 8 concurrent users
+- 3 serialization conflicts (HTTP 409) on concurrent receipt submissions
+- Concurrent receipt submissions may return retryable 409 responses
+- The demo is verified for sequential use (single-user walkthrough)
+- Do not claim the concurrent load test fully passed
+
 ### Deployment Status
 
 Deployed 2026-10-20. Frontend on Vercel, API on Oracle Cloud, DB on Supabase.

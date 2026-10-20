@@ -92,7 +92,11 @@ async function receive() {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      msg.value = (data && data.error) || `Failed (HTTP ${res.status})`;
+      if (res.status === 409) {
+        msg.value = (data && data.error) || "Conflict - please retry.";
+      } else {
+        msg.value = (data && data.error) || ("Failed (HTTP " + res.status + ")");
+      }
       msgOk.value = false;
       return;
     }
