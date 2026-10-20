@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Overview from "../views/Overview.vue";
 import Requests from "../views/Requests.vue";
+import Approvals from "../views/Approvals.vue";
+import Orders from "../views/Orders.vue";
 import Placeholder from "../views/Placeholder.vue";
 
 const router = createRouter({
@@ -8,7 +10,8 @@ const router = createRouter({
   routes: [
     { path: "/", name: "overview", component: Overview },
     { path: "/requests", name: "requests", component: Requests },
-    { path: "/orders", name: "orders", component: Placeholder },
+    { path: "/approvals", name: "approvals", component: Approvals },
+    { path: "/orders", name: "orders", component: Orders },
     { path: "/inventory", name: "inventory", component: Placeholder },
   ],
 });

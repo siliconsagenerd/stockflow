@@ -53,3 +53,11 @@ Returns 200 Healthy / 503 Unhealthy with JSON body.
 
 ## Known limitation
 MSB3277: EF Core 10.0.13 vs Npgsql 10.0.3 transitive EF Core Relational 10.0.4 (no matching standalone version available). Non-blocking; tracked separately. Cause not settled without dependency-resolution evidence.
+
+## Phase 3 — Approval & Purchase Order
+- Endpoints: POST /api/requests/{id}/approve, POST /api/requests/{id}/reject, GET /api/purchase-orders, GET /api/purchase-orders/{id}.
+- PurchaseOrder.Reference generated as PO- + first 8 hex chars of a new GUID.
+- Initial PO status: Open.
+- Concurrency: conditional ExecuteUpdateAsync with WHERE status='Pending' (rows==0 → 409) + unique constraint on PurchaseOrder.PurchaseRequestId. Transaction alone is insufficient; the conditional transition and unique constraint are the actual guards.
+- Approval derives supplier (product.PreferredSupplierId), warehouse (first seeded warehouse), product, quantity from trusted stored records.
+- Rejection reason bounded to 500 chars.

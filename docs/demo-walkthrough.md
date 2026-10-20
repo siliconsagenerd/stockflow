@@ -12,3 +12,12 @@ Two-minute script (to be finalized after features land):
 8. Show stock +4, order Completed.
 9. Show history timeline.
 10. Demonstrate one rejected invalid action (e.g., over-receipt or self-approval).
+## Phase 3 walkthrough
+1. Open app, create session (automatic).
+2. Switch to Anna Beispiel (Employee). Create a request (product + quantity).
+3. Switch to Markus Beispiel (Manager). Go to Approvals — see the Pending request.
+4. Click Approve. Request disappears from Approvals.
+5. Go to Purchase Orders — one Open order appears with reference, product, supplier, qty.
+6. Reload page — order persists.
+7. Create another request as Employee, switch to Manager, click Reject with a reason — request marked Rejected, no order created.
+8. Non-Manager identities see Switch to a Manager identity guidance; approve/reject buttons hidden.

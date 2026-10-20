@@ -1,0 +1,101 @@
+<template>
+  <section>
+    <h1>Approvals</h1>
+    <p class="muted">Pending requests in this workspace. Only a Manager demo identity can decide.</p>
+    <p v-if="!isManager" class="status-badge status-warning">Switch to a Manager identity to approve or reject.</p>
+
+    <div class="card">
+      <p v-if="loading" class="muted">Loading…</p>
+      <p v-else-if="pending.length === 0" class="muted">No pending requests.</p>
+      <div v-else v-for="r in pending" :key="r.id" class="card" style="margin-bottom:0.75rem;">
+        <strong>{{ r.productName }}</strong> <span class="muted">({{ r.productSku }})</span>
+        <div>Qty: {{ r.quantity }} {{ r.productUnit }}</div>
+        <div>Requester: {{ r.requesterName }}</div>
+        <div>Created: {{ new Date(r.createdAt).toLocaleString() }}</div>
+        <div v-if="r.justification" class="muted">Justification: {{ r.justification }}</div>
+        <div class="actions" style="margin-top:0.5rem;">
+          <button v-if="isManager" :disabled="busy" @click="decide(r.id, 'approve')">Approve</button>
+          <button v-if="isManager" class="secondary" :disabled="busy" @click="openReject(r.id)">Reject</button>
+        </div>
+        <div v-if="rejecting === r.id" style="margin-top:0.5rem;">
+          <textarea v-model="rejectReason" rows="2" placeholder="Reason (optional)" maxlength="500"></textarea>
+          <div class="actions">
+            <button :disabled="busy" @click="decide(r.id, 'reject')">Confirm reject</button>
+            <button class="secondary" @click="rejecting = null">Cancel</button>
+          </div>
+        </div>
+        <span v-if="msg[r.id]" class="status-badge" :class="msg[r.id].ok ? 'status-success' : 'status-danger'">{{ msg[r.id].text }}</span>
+      </div>
+    </div>
+    <p v-if="error" class="status-badge status-danger">{{ error }}</p>
+  </section>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
+import { apiFetch, ensureSession, getDemoUserId } from "../lib/api";
+
+interface RequestRow { id: string; productId: string; productName: string; productSku: string; productUnit: string; quantity: number; justification?: string | null; status: string; requesterId: string; requesterName: string; createdAt: string; workspaceId: string; }
+interface DemoUser { id: string; displayName: string; role: string; }
+
+const requests = ref<RequestRow[]>([]);
+const users = ref<DemoUser[]>([]);
+const loading = ref(true);
+const busy = ref(false);
+const error = ref("");
+const rejecting = ref<string | null>(null);
+const rejectReason = ref("");
+const msg = ref<Record<string, { text: string; ok: boolean }>>({});
+
+const selectedId = computed(() => getDemoUserId());
+const selectedUser = computed(() => users.value.find((u) => u.id === selectedId.value));
+const isManager = computed(() => selectedUser.value?.role === "Manager");
+const pending = computed(() => requests.value.filter((r) => r.status === "Pending"));
+
+onMounted(async () => {
+  try {
+    await ensureSession();
+    await load();
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : "Failed to load";
+  } finally {
+    loading.value = false;
+  }
+});
+
+async function load() {
+  const res = await apiFetch("/api/requests");
+  if (!res.ok) throw new Error("Failed to load requests");
+  requests.value = await res.json();
+  const ures = await apiFetch("/api/demo-users");
+  if (ures.ok) users.value = await ures.json();
+}
+
+function openReject(id: string) { rejecting.value = id; rejectReason.value = ""; }
+
+async function decide(id: string, action: "approve" | "reject") {
+  busy.value = true;
+  msg.value[id] = { text: "", ok: true };
+  try {
+    const body = action === "reject" ? { reason: rejectReason.value || null } : {};
+    const res = await apiFetch(`/api/requests/${id}/${action}`, { method: "POST", body: JSON.stringify(body) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      msg.value[id] = { text: (data && data.error) || `Failed (HTTP ${res.status})`, ok: false };
+      return;
+    }
+    msg.value[id] = { text: action === "approve" ? "Approved" : "Rejected", ok: true };
+    rejecting.value = null;
+    await load();
+  } catch (e) {
+    msg.value[id] = { text: e instanceof Error ? e.message : "Network error", ok: false };
+  } finally {
+    busy.value = false;
+  }
+}
+</script>
+
+<style scoped>
+.secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.status-warning { background: #fef3c7; color: #92400e; }
+</style>

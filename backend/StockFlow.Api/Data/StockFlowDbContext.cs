@@ -34,6 +34,7 @@ public class StockFlowDbContext : DbContext
             .HasOne(s => s.Workspace).WithMany().HasForeignKey(s => s.WorkspaceId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<DemoSession>().HasIndex(s => s.TokenHash).IsUnique();
 
+
         modelBuilder.Entity<PurchaseRequest>()
             .HasOne(r => r.Workspace).WithMany().HasForeignKey(r => r.WorkspaceId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<PurchaseRequest>()

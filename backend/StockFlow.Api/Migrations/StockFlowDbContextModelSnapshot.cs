@@ -173,6 +173,10 @@ namespace StockFlow.Api.Migrations
                     b.Property<int>("ReceivedQuantity")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
@@ -219,6 +223,9 @@ namespace StockFlow.Api.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("RequesterId")
                         .HasColumnType("uuid");
 
@@ -228,6 +235,10 @@ namespace StockFlow.Api.Migrations
 
                     b.Property<Guid>("WorkspaceId")
                         .HasColumnType("uuid");
+
+                    b.Property<long>("Xmin")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 

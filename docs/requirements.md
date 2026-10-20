@@ -31,3 +31,17 @@
 - Phase 3: approval + atomic PO creation
 - Phase 4: goods receipt, stock, idempotency, concurrency
 - Phase 5: overview dashboard, lifecycle timeline, UX polish
+### Phase 3 (approval + atomic PO creation)
+8. As a Manager (demo identity), I can view Pending requests in my workspace and approve or reject them.
+9. As a Manager, approval atomically creates exactly one Purchase Order (Open) derived from trusted stored records.
+10. As a Manager, I can reject a Pending request with a bounded reason; rejected requests cannot later be approved.
+11. As any identity, I can view Purchase Orders scoped to my workspace.
+## Acceptance criteria (Phase 3)
+- POST /api/requests/{id}/approve requires a valid session + Manager demo identity; self-approval rejected (403); non-Manager rejected (403); only Pending can transition (409 otherwise).
+- Approval atomically updates request to Approved (with decidedBy + decidedAt) and creates one PurchaseOrder (status Open) with supplier/warehouse/product/quantity derived from stored records.
+- Repeated approval returns 409 and creates no duplicate order (unique constraint on PurchaseOrder.PurchaseRequestId).
+- Concurrent approvals yield exactly one order.
+- POST /api/requests/{id}/reject requires Manager; records decidedBy, decidedAt, bounded reason (<=500 chars); rejected cannot be approved.
+- Concurrent approve/reject yields one consistent final state.
+- GET /api/purchase-orders and GET /api/purchase-orders/{id} scoped to session workspace; cross-workspace returns 404.
+- Transaction alone is NOT sufficient for concurrent safety; the conditional status transition (ExecuteUpdate with WHERE status='Pending') plus the unique constraint on PurchaseOrder.PurchaseRequestId are the actual guards.

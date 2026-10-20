@@ -9,6 +9,7 @@
       <nav class="nav" aria-label="Main navigation">
         <router-link to="/">Overview</router-link>
         <router-link to="/requests">Requests</router-link>
+        <router-link to="/approvals">Approvals</router-link>
         <router-link to="/orders">Purchase Orders</router-link>
         <router-link to="/inventory">Inventory</router-link>
       </nav>
