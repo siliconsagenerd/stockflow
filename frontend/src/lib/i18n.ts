@@ -65,7 +65,7 @@ const de: Record<string, string> = {
   "common.submit": "Absenden",
   "common.approve": "Freigeben",
   "common.reject": "Ablehnen",
-  "common.receive": "Wareneingang",
+  "common.receive": "Empfangen",
   "common.quantity": "Menge",
   "common.product": "Produkt",
   "common.status": "Status",

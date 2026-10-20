@@ -251,7 +251,7 @@ public class PurchaseOrdersController : ControllerBase
 
     private static bool IsSerializationFailure(Exception ex)
     {
-        return ex is DbUpdateException due && due.InnerException?.Message?.Contains("40001", StringComparison.OrdinalIgnoreCase) == true
+        return (ex is DbUpdateException due && due.InnerException?.Message?.Contains("40001", StringComparison.OrdinalIgnoreCase) == true)
             || ex.Message.Contains("40001", StringComparison.OrdinalIgnoreCase)
             || ex.Message.Contains("serialization", StringComparison.OrdinalIgnoreCase);
     }

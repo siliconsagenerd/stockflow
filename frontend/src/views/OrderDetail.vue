@@ -51,7 +51,7 @@ import { useI18n } from "../lib/i18n";
 import { apiFetch, ensureSession } from "../lib/api";
 
 interface Order { id: string; reference: string; purchaseRequestId: string; supplierId: string; supplierName: string; warehouseId: string; warehouseName: string; productId: string; productName: string; productSku: string; orderedQuantity: number; receivedQuantity: number; status: string; createdAt: string; }
-interface Receipt { id: string; purchaseOrderId: string; workspaceId: string; quantity: number; receivedById: string; receivedByName: string; receivedAt: string; idempotencyKey: string; orderEmpfangendQuantity: number; orderStatus: string; }
+interface Receipt { id: string; purchaseOrderId: string; workspaceId: string; quantity: number; receivedById: string; receivedByName: string; receivedAt: string; idempotencyKey: string; orderReceivedQuantity: number; orderStatus: string; }
 
 const route = useRoute();
 const order = ref<Order | null>(null);
@@ -83,7 +83,6 @@ async function load() {
   order.value = await r.json();
   const rr = await apiFetch(`/api/purchase-orders/${id}/receipts`);
   if (rr.ok) receipts.value = await rr.json();
-  // receipts: fetch from movements? We'll keep a local list; reload not available, so fetch all receipts via a simple approach: none endpoint. Show empty for now.
 }
 
 async function receive() {

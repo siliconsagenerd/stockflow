@@ -25,6 +25,7 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+._*
 
 # Misc
 publish/

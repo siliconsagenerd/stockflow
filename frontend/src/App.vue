@@ -38,15 +38,17 @@ onMounted(() => {
 });
 </script>
 <style scoped>
-.header-actions { display: flex; align-items: center; gap: 1rem; }
+.header-actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
 .lang-toggle {
-  padding: 0.25rem 0.6rem;
+  padding: 0.3rem 0.6rem;
   border: 1px solid var(--border, #ccc);
-  border-radius: 4px;
-  background: transparent;
+  border-radius: var(--radius, 4px);
+  background: var(--surface, #fff);
+  color: var(--text, #111);
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
-.lang-toggle:hover { background: var(--hover, #eee); }
+.lang-toggle:hover { background: var(--surface-2, #eee); border-color: var(--border-strong, #bbb); }
 </style>

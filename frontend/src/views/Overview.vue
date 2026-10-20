@@ -72,10 +72,9 @@ onMounted(async () => {
 });
 </script>
 <style scoped>
-.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
-.metric { text-decoration: none; color: inherit; text-align: center; }
-.metric-value { font-size: 2rem; font-weight: 700; }
-.metric-label { font-size: 0.85rem; color: var(--muted); }
+.metrics { display: grid; }
+.metric { text-decoration: none; color: inherit; }
+.metric-value { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .activity { list-style: none; padding: 0; }
-.activity li { padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
+.activity li { padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
 </style>
