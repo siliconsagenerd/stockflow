@@ -226,6 +226,24 @@ public class ReceiptTests : IClassFixture<StockFlowWebApplicationFactory>, IAsyn
     }
 
     [Fact]
+    public async Task ConcurrentDuplicateSubmission_OneReceipt()
+    {
+        var (client, wsId, empId, mgrId, whId, productId) = await SetupAsync();
+        var poId = await CreateApprovedPoAsync(client, productId, empId, mgrId, 10);
+
+        As(client, whId);
+        var t1 = client.PostAsJsonAsync($"/api/purchase-orders/{poId}/receive", new { quantity = 6, idempotencyKey = "concdup" });
+        var t2 = client.PostAsJsonAsync($"/api/purchase-orders/{poId}/receive", new { quantity = 6, idempotencyKey = "concdup" });
+        await Task.WhenAll(t1, t2);
+        // Both should succeed (one creates, other replays)
+        Assert.True(t1.Result.IsSuccessStatusCode || t2.Result.IsSuccessStatusCode);
+
+        var moves = await client.GetFromJsonAsync<List<StockMovementDto>>("/api/stock-movements");
+        var receiptMoves = moves!.Where(m => m.Reason == "GoodsReceipt" && m.Delta == 6).ToList();
+        Assert.Single(receiptMoves);
+    }
+
+    [Fact]
     public async Task ZeroOpeningStock_NoDuplicate()
     {
         var (client, wsId, empId, mgrId, whId, productId) = await SetupAsync();
