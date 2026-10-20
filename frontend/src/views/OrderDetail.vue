@@ -1,36 +1,36 @@
 <template>
   <section>
-    <p><router-link to="/orders">← Zurück zu Bestellungen</router-link></p>
-    <h1>Bestellung {{ order?.reference }}</h1>
-    <p v-if="loading" class="muted">Laden…</p>
+    <p><router-link to="/orders">← {{ t("order.backToOrders") }}</router-link></p>
+    <h1>{{ t("order.title") }} {{ order?.reference }}</h1>
+    <p v-if="loading" class="muted">{{ t("common.loading") }}</p>
     <p v-if="error" class="status-badge status-danger">{{ error }}</p>
 
     <div v-if="order" class="card">
-      <div>Produkt: <strong>{{ order.productName }}</strong> ({{ order.productSku }})</div>
-      <div>Lieferant: {{ order.supplierName }}</div>
-      <div>Lager: {{ order.warehouseName }}</div>
-      <div>Bestellt: {{ order.orderedQuantity }}</div>
-      <div>Empfangen: {{ order.receivedQuantity }}</div>
-      <div>Ausstehend: {{ order.orderedQuantity - order.receivedQuantity }}</div>
-      <div>Status: <span class="status-badge status-pending">{{ tStatus(order.status) }}</span></div>
-      <div>Erstellt: {{ new Date(order.createdAt).toLocaleString() }}</div>
+      <div>{{ t("common.product") }}: <strong>{{ order.productName }}</strong> ({{ order.productSku }})</div>
+      <div>{{ t("orders.supplier") }}: {{ order.supplierName }}</div>
+      <div>{{ t("inventory.warehouse") }}: {{ order.warehouseName }}</div>
+      <div>{{ t("order.ordered") }}: {{ order.orderedQuantity }}</div>
+      <div>{{ t("order.received") }}: {{ order.receivedQuantity }}</div>
+      <div>{{ t("order.outstanding") }}: {{ order.orderedQuantity - order.receivedQuantity }}</div>
+      <div>{{ t("common.status") }}: <span class="status-badge status-pending">{{ tStatus(order.status) }}</span></div>
+      <div>{{ t("common.date") }}: {{ new Date(order.createdAt).toLocaleString() }}</div>
     </div>
 
     <div v-if="order && order.status !== 'Completed'" class="card">
-      <h2>Wareneingang</h2>
-      <label>Menge empfangen</label>
+      <h2>{{ t("order.receive") }}</h2>
+      <label>{{ t("order.quantityReceived") }}</label>
       <input v-model.number="qty" type="number" min="1" />
       <div class="actions">
-        <button :disabled="busy" @click="receive">Empfangen</button>
+        <button :disabled="busy" @click="receive">{{ t("common.receive") }}</button>
       </div>
       <p v-if="msg" class="status-badge" :class="msgOk ? 'status-success' : 'status-danger'">{{ msg }}</p>
     </div>
 
     <div class="card">
-      <h2>Wareneingangshistorie</h2>
-      <p v-if="receipts.length === 0" class="muted">Noch keine Wareneingänge.</p>
+      <h2>{{ t("order.receiptHistory") }}</h2>
+      <p v-if="receipts.length === 0" class="muted">{{ t("order.noReceipts") }}</p>
       <div class="table-wrap" v-else><table class="table">
-        <thead><tr><th>Zeit</th><th>Menge</th><th>Benutzer</th><th>Idempotenzschlüssel</th></tr></thead>
+        <thead><tr><th>{{ t("common.date") }}</th><th>{{ t("common.quantity") }}</th><th>{{ t("order.user") }}</th><th>{{ t("order.idempotencyKey") }}</th></tr></thead>
         <tbody>
           <tr v-for="r in receipts" :key="r.id">
             <td>{{ new Date(r.receivedAt).toLocaleString() }}</td>
@@ -59,7 +59,7 @@ const receipts = ref<Receipt[]>([]);
 const loading = ref(true);
 const error = ref("");
 const qty = ref(1);
-const { tStatus, tApi } = useI18n();
+const { t, tStatus, tApi } = useI18n();
 const busy = ref(false);
 const msg = ref("");
 const msgOk = ref(true);
@@ -70,7 +70,7 @@ onMounted(async () => {
     await ensureSession();
     await load();
   } catch (e) {
-    error.value = e instanceof Error ? e.message : "Laden fehlgeschlagen";
+    error.value = e instanceof Error ? e.message : t("common.loadFailed");
   } finally {
     loading.value = false;
   }
@@ -79,7 +79,7 @@ onMounted(async () => {
 async function load() {
   const id = route.params.id as string;
   const r = await apiFetch(`/api/purchase-orders/${id}`);
-  if (!r.ok) { error.value = "Nicht gefunden"; return; }
+  if (!r.ok) { error.value = t("order.notFound"); return; }
   order.value = await r.json();
   const rr = await apiFetch(`/api/purchase-orders/${id}/receipts`);
   if (rr.ok) receipts.value = await rr.json();
@@ -97,14 +97,14 @@ async function receive() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       if (res.status === 409) {
-        msg.value = tApi((data && data.error) || "Konflikt – bitte erneut versuchen.");
+        msg.value = tApi((data && data.error) || t("order.conflict"));
       } else {
-        msg.value = tApi((data && data.error) || ("Fehler (HTTP " + res.status + ")"));
+        msg.value = tApi((data && data.error) || (t("common.error") + " (HTTP " + res.status + ")"));
       }
       msgOk.value = false;
       return;
     }
-    msg.value = "Erfolgreich erfasst";
+    msg.value = t("order.receiveSuccess");
     msgOk.value = true;
     // update order + generate new key for next receipt
     await load();

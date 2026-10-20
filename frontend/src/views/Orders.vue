@@ -1,20 +1,20 @@
 <template>
   <section>
     <h1>{{ t("nav.orders") }}</h1>
-    <p class="muted">Bestellungen aus freigegebenen Anfragen in diesem Workspace.</p>
+    <p class="muted">{{ t("orders.subtitle") }}</p>
 
     <div class="card">
-      <p v-if="loading" class="muted">Laden…</p>
-      <p v-else-if="orders.length === 0" class="muted">Noch keine Bestellungen.</p>
+      <p v-if="loading" class="muted">{{ t("common.loading") }}</p>
+      <p v-else-if="orders.length === 0" class="muted">{{ t("orders.empty") }}</p>
       <div class="table-wrap" v-else><table class="table">
         <thead>
           <tr>
-            <th>Referenz</th>
-            <th>Produkt</th>
-            <th>Lieferant</th>
-            <th>Menge</th>
-            <th>Status</th>
-            <th>Erstellt</th>
+            <th>{{ t("orders.reference") }}</th>
+            <th>{{ t("common.product") }}</th>
+            <th>{{ t("orders.supplier") }}</th>
+            <th>{{ t("common.quantity") }}</th>
+            <th>{{ t("common.status") }}</th>
+            <th>{{ t("common.date") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -49,10 +49,10 @@ onMounted(async () => {
   try {
     await ensureSession();
     const res = await apiFetch("/api/purchase-orders");
-    if (!res.ok) throw new Error("Bestellungen konnten nicht geladen werden");
+    if (!res.ok) throw new Error(t("orders.loadFailed"));
     orders.value = await res.json();
   } catch (e) {
-    error.value = e instanceof Error ? e.message : "Laden fehlgeschlagen";
+    error.value = e instanceof Error ? e.message : t("common.loadFailed");
   } finally {
     loading.value = false;
   }

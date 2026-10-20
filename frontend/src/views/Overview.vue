@@ -1,14 +1,14 @@
 <template>
   <section>
     <h1>{{ t("nav.overview") }}</h1>
-    <p class="muted">StockFlow: {{ t("app.subtitle") }} — Anfrage → Freigabe → Bestellung → Wareneingang → Bestand.</p>
+    <p class="muted">StockFlow: {{ t("app.subtitle") }}, {{ t("overview.flow") }}.</p>
     <div class="card">
-      <h2>Demo starten</h2>
+      <h2>{{ t("overview.demoStart") }}</h2>
       <ol>
-        <li>Wechseln Sie zu <strong>Anna Beispiel (Employee)</strong> und erstellen Sie eine Anfrage für 10 Stück.</li>
-        <li>Wechseln Sie zu <strong>Markus Beispiel (Manager)</strong> und geben Sie sie frei.</li>
-        <li>Wechseln Sie zu <strong>Werner Beispiel (Warehouse)</strong>, öffnen Sie die Bestellung und empfangen Sie 6.</li>
-        <li>Empfangen Sie die restlichen 4, um die Bestellung abzuschließen.</li>
+        <li>{{ t("overview.step1") }}</li>
+        <li>{{ t("overview.step2") }}</li>
+        <li>{{ t("overview.step3") }}</li>
+        <li>{{ t("overview.step4") }}</li>
       </ol>
     </div>
     <div v-if="loading" class="muted">{{ t("common.loading") }}</div>
@@ -20,7 +20,7 @@
       </router-link>
       <router-link to="/orders" class="metric card">
         <div class="metric-value">{{ overview?.openOrders ?? 0 }}</div>
-        <div class="metric-label">Offene Bestellungen (inkl. Teil)</div>
+        <div class="metric-label">{{ t("overview.openOrders") }}</div>
       </router-link>
       <router-link to="/orders" class="metric card">
         <div class="metric-value">{{ overview?.completedOrders ?? 0 }}</div>
@@ -36,17 +36,17 @@
       </div>
     </div>
     <div class="card">
-      <h2>Letzte Aktivitäten</h2>
-      <p v-if="!overview?.recentActivity?.length" class="muted">Noch keine Aktivität. Erstellen Sie eine Anfrage.</p>
+      <h2>{{ t("overview.recentActivity") }}</h2>
+      <p v-if="!overview?.recentActivity?.length" class="muted">{{ t("overview.noActivity") }}</p>
       <ul v-else class="activity">
         <li v-for="(a, i) in overview.recentActivity" :key="i">
-          <span class="muted">{{ new Date(a.at).toLocaleString() }}</span> — {{ a.label }} <span class="status-badge status-ok">{{ tStatus(a.status) }}</span>
+          <span class="muted">{{ new Date(a.at).toLocaleString() }}</span>, {{ a.label }} <span class="status-badge status-ok">{{ tStatus(a.status) }}</span>
         </li>
       </ul>
     </div>
     <div class="card">
-      <h2>So funktioniert es</h2>
-      <p>Anfrage → Freigabe → Bestellung → Wareneingang → Bestand. Jeder Schritt wird pro Workspace gespeichert; Demo-Identitäten simulieren Rollen.</p>
+      <h2>{{ t("overview.howItWorks") }}</h2>
+      <p>{{ t("overview.howItWorksBody") }}</p>
     </div>
   </section>
 </template>
@@ -62,7 +62,7 @@ onMounted(async () => {
   try {
     await ensureSession();
     const res = await apiFetch("/api/overview");
-    if (!res.ok) throw new Error("Übersicht konnte nicht geladen werden");
+    if (!res.ok) throw new Error(t("overview.loadFailed"));
     overview.value = await res.json();
   } catch (e) {
     error.value = e instanceof Error ? e.message : "Laden fehlgeschlagen";
