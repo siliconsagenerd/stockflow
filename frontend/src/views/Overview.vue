@@ -30,8 +30,8 @@
         <div class="metric-label">Completed orders</div>
       </router-link>
       <div class="metric card">
-        <div class="metric-value">{{ overview?.totalReceivedUnits ?? 0 }}</div>
-        <div class="metric-label">Total received (units)</div>
+        <div class="metric-value">{{ overview?.receiptsRecorded ?? 0 }}</div>
+        <div class="metric-label">Receipts recorded</div>
       </div>
       <div class="metric card">
         <div class="metric-value">{{ overview?.productsWithStock ?? 0 }}</div>

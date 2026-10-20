@@ -31,8 +31,8 @@ public class OverviewController : ControllerBase
         var pendingRequests = await _db.PurchaseRequests.CountAsync(r => r.WorkspaceId == wsId && r.Status == "Pending");
         var openOrders = await _db.PurchaseOrders.CountAsync(o => o.PurchaseRequest.WorkspaceId == wsId && (o.Status == "Open" || o.Status == "PartiallyReceived"));
         var completedOrders = await _db.PurchaseOrders.CountAsync(o => o.PurchaseRequest.WorkspaceId == wsId && o.Status == "Completed");
-        var totalReceivedUnits = await _db.GoodsReceipts.Where(g => g.WorkspaceId == wsId).SumAsync(g => (int?)g.Quantity) ?? 0;
-        var productsWithStock = await _db.StockBalances.CountAsync(b => b.WorkspaceId == wsId && b.Quantity > 0);
+        var receiptsRecorded = await _db.GoodsReceipts.CountAsync(g => g.WorkspaceId == wsId);
+        var productsWithStock = await _db.StockBalances.Where(b => b.WorkspaceId == wsId && b.Quantity > 0).Select(b => b.ProductId).Distinct().CountAsync();
 
         // Recent activity: last 10 records across requests, orders, receipts
         var recentRequests = await _db.PurchaseRequests
@@ -68,7 +68,7 @@ public class OverviewController : ControllerBase
             pendingRequests,
             openOrders,
             completedOrders,
-            totalReceivedUnits,
+            receiptsRecorded,
             productsWithStock,
             recentActivity = activity
         });
