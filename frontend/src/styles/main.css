@@ -42,6 +42,8 @@ a:hover { color: var(--accent-hover); text-decoration: underline; }
   display: grid;
   grid-template-rows: auto 1fr;
 }
+/* grid items must not stretch the column past the viewport (tables) */
+.app-header, .app-main { min-width: 0; }
 .app-header {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
