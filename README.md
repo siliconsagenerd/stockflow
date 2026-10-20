@@ -1,4 +1,4 @@
-# StockFlow — From Request to Receipt
+# StockFlow: From Request to Receipt
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
@@ -13,7 +13,7 @@ partial and final goods receipt, to workspace-scoped stock balances and movement
 history. Built for the dinext Working Student Developer application.
 
 Live demo: https://stockflow-frontend-mauve.vercel.app/
-Demo identities are simulated — not real authentication.
+Demo identities are simulated, not real authentication.
 
 ```mermaid
 flowchart LR
@@ -38,15 +38,15 @@ flowchart LR
 
 ## Features
 
-- **Request creation** — product selection, positive quantity, optional justification
-- **Manager approval / rejection** — self-approval blocked, only Pending transitions
-- **Atomic purchase orders** — created on approval, unique constraint on request
-- **Partial & final goods receipt** — 6 then 4 units, serializable isolation
-- **Workspace-scoped inventory** — balances and movement history per workspace
-- **Receipt idempotency** — same key + payload returns original; conflicting key rejected
-- **Anonymous sessions** — HttpOnly cookie, SHA-256 hashed, 8h expiry
-- **Overview dashboard** — metrics, recent activity, demo guide
-- **Responsive UI** — desktop and mobile layouts
+- **Request creation:** product selection, positive quantity, optional justification
+- **Manager approval / rejection:** self-approval blocked, only Pending transitions
+- **Atomic purchase orders:** created on approval, unique constraint on request
+- **Partial & final goods receipt:** 6 then 4 units, serializable isolation
+- **Workspace-scoped inventory:** balances and movement history per workspace
+- **Receipt idempotency:** same key + payload returns original; conflicting key rejected
+- **Anonymous sessions:** HttpOnly cookie, SHA-256 hashed, 8h expiry
+- **Overview dashboard:** metrics, recent activity, demo guide
+- **Responsive UI:** desktop and mobile layouts
 
 ## Stack
 
@@ -131,9 +131,9 @@ GoodsReceipt.IdempotencyKey (scoped to workspace), unique DemoSession token hash
 
 ### Idempotency Conflict/Replay
 
-- Same key + same payload → returns original receipt.
-- Same key + different payload → HTTP 409 Conflict.
-- Concurrent conflicting transactions → HTTP 409 (retryable, preserve key).
+- Same key + same payload returns the original receipt.
+- Same key + different payload returns HTTP 409 Conflict.
+- Concurrent conflicting transactions return HTTP 409 (retryable; keep the key).
 
 ## Demo Walkthrough (10 → 6 → 4)
 
@@ -147,7 +147,7 @@ GoodsReceipt.IdempotencyKey (scoped to workspace), unique DemoSession token hash
 
 Demo roles (Employee, Manager, Warehouse) are selected via a dropdown and sent as
 an `X-Demo-User` header. There are no passwords, no JWT, and no identity provider.
-This is labelled "Demo identity — not secure authentication" throughout.
+Labelled "Demo identity, not secure authentication" throughout.
 
 ## Anonymous Session Limitations
 
