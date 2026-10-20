@@ -117,3 +117,94 @@ All phases (1–6) complete. Local acceptance verified.
 - API unreachable from M2: ensure SSH tunnel is active.
 - Test DB: recreate with `DROP DATABASE IF EXISTS stockflow_test; CREATE DATABASE stockflow_test OWNER stockflow;`
 - MSB3277 warning: known version skew between EF Core 10.0.13 and Npgsql 10.0.3; not suppressed.
+
+## Live Demo
+
+- **Frontend**: https://stockflow-frontend-mauve.vercel.app
+- **API Health**: https://stockflowap1.duckdns.org/health
+
+### What the Demo Does
+
+StockFlow demonstrates a procurement and inventory workflow:
+request → approval → purchase order → partial/complete receipt → stock update → history.
+
+Demo identities (Employee, Manager, Warehouse) are **simulated** — not real
+authentication. Workspace access is anonymous and possession-based via a cookie.
+
+### Simulated Identities vs Real Authentication
+
+- Demo roles are selected via a dropdown and sent as an  header.
+- No passwords, no JWT, no identity provider.
+- Anonymous session cookie () grants workspace access.
+- Labelled Demo identity — not secure authentication throughout.
+
+### Anonymous Session Limitations
+
+- Sessions are possession-based: anyone with the cookie can access the workspace.
+- 8-hour expiry, HttpOnly, SameSite=Strict, Secure in production.
+- No user registration, no password recovery, no multi-device sync.
+
+### Zero Opening Stock
+
+- All products start with zero stock.
+- Stock enters only through goods receipts against purchase orders.
+- No manual stock adjustments or opening balances.
+
+### Known Limitations
+
+- No real SAP/ERP integration.
+- No AI, no enterprise auth, no multi-warehouse, no transfers.
+- MSB3277 warning (EF Core/Npgsql version skew, tracked, not suppressed).
+- Supabase free tier (7-day backup retention, 500MB limit).
+- Oracle Cloud free tier (short-lived deployment).
+
+### Deployment Status
+
+Deployed 2026-10-20. Frontend on Vercel, API on Oracle Cloud, DB on Supabase.
+See  for operational details.
+
+
+## Live Demo
+
+- **Frontend**: https://stockflow-frontend-mauve.vercel.app
+- **API Health**: https://stockflowap1.duckdns.org/health
+
+### What the Demo Does
+
+StockFlow demonstrates a procurement and inventory workflow:
+request to approval to purchase order to partial/complete receipt to stock update to history.
+
+Demo identities (Employee, Manager, Warehouse) are simulated, not real
+authentication. Workspace access is anonymous and possession-based via a cookie.
+
+### Simulated Identities vs Real Authentication
+
+- Demo roles are selected via a dropdown and sent as an X-Demo-User header.
+- No passwords, no JWT, no identity provider.
+- Anonymous session cookie grants workspace access.
+- Labelled Demo identity - not secure authentication throughout.
+
+### Anonymous Session Limitations
+
+- Sessions are possession-based: anyone with the cookie can access the workspace.
+- 8-hour expiry, HttpOnly, SameSite=Strict, Secure in production.
+- No user registration, no password recovery, no multi-device sync.
+
+### Zero Opening Stock
+
+- All products start with zero stock.
+- Stock enters only through goods receipts against purchase orders.
+- No manual stock adjustments or opening balances.
+
+### Known Limitations
+
+- No real SAP/ERP integration.
+- No AI, no enterprise auth, no multi-warehouse, no transfers.
+- MSB3277 warning (EF Core/Npgsql version skew, tracked, not suppressed).
+- Supabase free tier (7-day backup retention, 500MB limit).
+- Oracle Cloud free tier (short-lived deployment).
+
+### Deployment Status
+
+Deployed 2026-10-20. Frontend on Vercel, API on Oracle Cloud, DB on Supabase.
+See docs/RUNBOOK.md for operational details.
