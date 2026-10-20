@@ -117,8 +117,8 @@ async function loadRequests() {
 async function submit() {
   successMsg.value = "";
   errorMsg.value = "";
-  if (!form.value.productId) { errorMsg.value = "Select a product."; return; }
-  if (!form.value.quantity || form.value.quantity < 1) { errorMsg.value = "Quantity must be a positive whole number."; return; }
+  if (!form.value.productId) { errorMsg.value = "Produkt auswählen."; return; }
+  if (!form.value.quantity || form.value.quantity < 1) { errorMsg.value = "Menge muss eine positive ganze Zahl sein."; return; }
   submitting.value = true;
   try {
     const res = await apiFetch("/api/requests", {
