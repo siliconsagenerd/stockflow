@@ -1,7 +1,7 @@
 <template>
   <div class="card" style="margin-bottom:0.5rem;">
     <strong>{{ t("identity.label") }}</strong>
-    <span class="muted"> — {{ t("identity.hint") }}.</span>
+    <span class="muted">, {{ t("identity.hint") }}.</span>
     <select v-model="selected" @change="onChange" style="margin-left:0.5rem;">
       <option v-for="u in users" :key="u.id" :value="u.id">{{ u.displayName }} ({{ u.role }})</option>
     </select>

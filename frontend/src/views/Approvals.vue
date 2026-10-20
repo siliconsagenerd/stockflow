@@ -1,29 +1,29 @@
 <template>
   <section>
     <h1>{{ t("nav.approvals") }}</h1>
-    <p class="muted">Ausstehende Anfragen in diesem Workspace. Nur eine Manager-Demo-Identität kann entscheiden.</p>
-    <p v-if="!isManager" class="status-badge status-warning">Zu einer Manager-Identität wechseln, um freizugeben oder abzulehnen.</p>
+    <p class="muted">{{ t("approvals.subtitle") }}</p>
+    <p v-if="!isManager" class="status-badge status-warning">{{ t("approvals.switchToManager") }}</p>
 
     <p v-if="pageMsg" class="status-badge" :class="pageMsg.ok ? 'status-success' : 'status-danger'" style="margin-bottom:0.75rem;">{{ pageMsg.text }}</p>
     <div class="card">
-      <p v-if="loading" class="muted">Laden…</p>
-      <p v-else-if="pending.length === 0" class="muted">Keine ausstehenden Anfragen.</p>
+      <p v-if="loading" class="muted">{{ t("common.loading") }}</p>
+      <p v-else-if="pending.length === 0" class="muted">{{ t("approvals.empty") }}</p>
       <div v-else v-for="r in pending" :key="r.id" class="card" style="margin-bottom:0.75rem;">
         <strong>{{ r.productName }}</strong> <span class="muted">({{ r.productSku }})</span>
-        <div>Menge: {{ r.quantity }} {{ r.productUnit }}</div>
-        <div>Anfragender: {{ r.requesterName }}</div>
-        <p v-if="r.requesterId === selectedId" class="muted" style="margin-top:0.25rem;">Ihre eigene Anfrage – Vier-Augen-Prinzip: Eine andere Manager-Identität muss entscheiden. Sie können nicht selbst freigeben oder ablehnen.</p>
-        <div>Erstellt: {{ new Date(r.createdAt).toLocaleString() }}</div>
-        <div v-if="r.justification" class="muted">Begründung: {{ r.justification }}</div>
+        <div>{{ t("common.quantity") }}: {{ r.quantity }} {{ r.productUnit }}</div>
+        <div>{{ t("request.requester") }}: {{ r.requesterName }}</div>
+        <p v-if="r.requesterId === selectedId" class="muted" style="margin-top:0.25rem;">{{ t("approval.selfHint") }}</p>
+        <div>{{ t("common.date") }}: {{ new Date(r.createdAt).toLocaleString() }}</div>
+        <div v-if="r.justification" class="muted">{{ t("request.justification") }}: {{ r.justification }}</div>
         <div class="actions" style="margin-top:0.5rem;">
-          <button v-if="isManager" :disabled="busy || r.requesterId === selectedId" @click="decide(r.id, 'approve')">Freigeben</button>
-          <button v-if="isManager" class="secondary" :disabled="busy || r.requesterId === selectedId" @click="openReject(r.id)">Ablehnen</button>
+          <button v-if="isManager" :disabled="busy || r.requesterId === selectedId" @click="decide(r.id, 'approve')">{{ t("common.approve") }}</button>
+          <button v-if="isManager" class="secondary" :disabled="busy || r.requesterId === selectedId" @click="openReject(r.id)">{{ t("common.reject") }}</button>
         </div>
         <div v-if="rejecting === r.id" style="margin-top:0.5rem;">
-          <textarea v-model="rejectReason" rows="2" placeholder="Grund (optional)" maxlength="500"></textarea>
+          <textarea v-model="rejectReason" rows="2" :placeholder="t('approval.reasonPlaceholder')" maxlength="500"></textarea>
           <div class="actions">
-            <button :disabled="busy" @click="decide(r.id, 'reject')">Ablehnung bestätigen</button>
-            <button class="secondary" @click="rejecting = null">Abbrechen</button>
+            <button :disabled="busy" @click="decide(r.id, 'reject')">{{ t("approval.confirmReject") }}</button>
+            <button class="secondary" @click="rejecting = null">{{ t("common.cancel") }}</button>
           </div>
         </div>
         <span v-if="msg[r.id]" class="status-badge" :class="msg[r.id].ok ? 'status-success' : 'status-danger'">{{ msg[r.id].text }}</span>
@@ -62,7 +62,7 @@ onMounted(async () => {
     await ensureSession();
     await load();
   } catch (e) {
-    error.value = e instanceof Error ? e.message : "Laden fehlgeschlagen";
+    error.value = e instanceof Error ? e.message : t("common.loadFailed");
   } finally {
     loading.value = false;
   }
@@ -70,7 +70,7 @@ onMounted(async () => {
 
 async function load() {
   const res = await apiFetch("/api/requests");
-  if (!res.ok) throw new Error("Anfragen konnten nicht geladen werden");
+  if (!res.ok) throw new Error(t("request.requestsLoadFailed"));
   requests.value = await res.json();
   const ures = await apiFetch("/api/demo-users");
   if (ures.ok) users.value = await ures.json();
@@ -89,12 +89,12 @@ async function decide(id: string, action: "approve" | "reject") {
       msg.value[id] = { text: tApi((data && data.error) || `Fehler (HTTP ${res.status})`), ok: false };
       return;
     }
-    msg.value[id] = { text: action === "approve" ? "Freigeben erfolgreich" : "Abgelehnt", ok: true };
-    pageMsg.value = { text: action === "approve" ? "Freigeben erfolgreich" : "Abgelehnt", ok: true };
+    msg.value[id] = { text: action === "approve" ? t("approval.approveSuccess") : t("approval.rejected"), ok: true };
+    pageMsg.value = { text: action === "approve" ? t("approval.approveSuccess") : t("approval.rejected"), ok: true };
     rejecting.value = null;
     await load();
   } catch (e) {
-    msg.value[id] = { text: e instanceof Error ? e.message : "Netzwerkfehler", ok: false };
+    msg.value[id] = { text: e instanceof Error ? e.message : t("common.networkError"), ok: false };
   } finally {
     busy.value = false;
   }

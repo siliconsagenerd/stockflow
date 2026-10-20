@@ -1,15 +1,15 @@
 <template>
   <section>
     <h1>{{ t("nav.inventory") }}</h1>
-    <p class="muted">Workspace-spezifische Bestände und Bewegungshistorie.</p>
+    <p class="muted">{{ t("inventory.subtitle") }}</p>
 
     <div class="card">
-      <h2>Bestände</h2>
-      <p v-if="loading" class="muted">Laden…</p>
-      <p v-else-if="balances.length === 0" class="muted">Noch keine Bestände.</p>
+      <h2>{{ t("inventory.balance") }}</h2>
+      <p v-if="loading" class="muted">{{ t("common.loading") }}</p>
+      <p v-else-if="balances.length === 0" class="muted">{{ t("inventory.noBalances") }}</p>
       <div class="table-wrap" v-else><table class="table">
         <thead>
-          <tr><th>Produkt</th><th>Lager</th><th>Menge</th></tr>
+          <tr><th>{{ t("common.product") }}</th><th>{{ t("inventory.warehouse") }}</th><th>{{ t("common.quantity") }}</th></tr>
         </thead>
         <tbody>
           <tr v-for="b in balances" :key="b.productId + b.warehouseId">
@@ -22,11 +22,11 @@
     </div>
 
     <div class="card">
-      <h2>Bewegungshistorie</h2>
-      <p v-if="movements.length === 0" class="muted">Noch keine Bewegungen.</p>
+      <h2>{{ t("inventory.movements") }}</h2>
+      <p v-if="movements.length === 0" class="muted">{{ t("inventory.noMovements") }}</p>
       <div class="table-wrap" v-else><table class="table">
         <thead>
-          <tr><th>Zeit</th><th>Produkt</th><th>Änderung</th><th>Grund</th><th>Referenz</th></tr>
+          <tr><th>{{ t("common.date") }}</th><th>{{ t("common.product") }}</th><th>{{ t("inventory.delta") }}</th><th>{{ t("inventory.reason") }}</th><th>{{ t("inventory.reference") }}</th></tr>
         </thead>
         <tbody>
           <tr v-for="m in movements" :key="m.id">
@@ -34,7 +34,7 @@
             <td>{{ m.productName }}</td>
             <td :class="m.delta >= 0 ? 'pos' : 'neg'">{{ m.delta > 0 ? '+' : '' }}{{ m.delta }}</td>
             <td>{{ m.reason }}</td>
-            <td class="muted">{{ m.referenceId ?? '—' }}</td>
+            <td class="muted">{{ m.referenceId ?? '-' }}</td>
           </tr>
         </tbody>
       </table></div>
@@ -63,7 +63,7 @@ onMounted(async () => {
     const b = await apiFetch("/api/inventory"); if (b.ok) balances.value = await b.json();
     const m = await apiFetch("/api/stock-movements"); if (m.ok) movements.value = await m.json();
   } catch (e) {
-    error.value = e instanceof Error ? e.message : "Laden fehlgeschlagen";
+    error.value = e instanceof Error ? e.message : t("common.loadFailed");
   } finally {
     loading.value = false;
   }

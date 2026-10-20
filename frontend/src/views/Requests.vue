@@ -1,32 +1,32 @@
 <template>
   <section>
     <h1>{{ t("nav.requests") }}</h1>
-    <p class="muted">Materialanfragen erstellen. Jede wird als Ausstehend für den aktuellen Demo-Workspace gespeichert.</p>
+    <p class="muted">{{ t("requests.subtitle") }}</p>
 
     <div class="card">
-      <h2>Neue Anfrage</h2>
+      <h2>{{ t("request.create") }}</h2>
       <form @submit.prevent="submit" novalidate>
         <div class="field">
-          <label for="product">Produkt</label>
+          <label for="product">{{ t("common.product") }}</label>
           <select id="product" v-model="form.productId" required>
-            <option value="" disabled>Produkt auswählen…</option>
+            <option value="" disabled>{{ t("request.selectProduct") }}</option>
             <option v-for="p in products" :key="p.id" :value="p.id">
-              {{ p.name }} ({{ p.sku }}) — {{ p.unit }}
+              {{ p.name }} ({{ p.sku }}), {{ p.unit }}
             </option>
           </select>
         </div>
         <div class="field">
-          <label for="qty">Menge</label>
+          <label for="qty">{{ t("common.quantity") }}</label>
           <input id="qty" type="number" min="1" step="1" v-model.number="form.quantity" required />
         </div>
         <div class="field">
-          <label for="just">Begründung (optional)</label>
+          <label for="just">{{ t("request.justification") }}</label>
           <textarea id="just" v-model="form.justification" maxlength="500" rows="3"></textarea>
           <span class="muted">{{ (form.justification || "").length }}/500</span>
         </div>
         <div class="actions">
           <button type="submit" :disabled="submitting">
-            {{ submitting ? "Wird gesendet…" : "Anfrage absenden" }}
+            {{ submitting ? t("request.submitting") : t("request.submit") }}
           </button>
           <span v-if="successMsg" class="status-badge status-success" role="status">{{ successMsg }}</span>
           <span v-if="errorMsg" class="status-badge status-danger" role="alert">{{ errorMsg }}</span>
@@ -35,17 +35,17 @@
     </div>
 
     <div class="card">
-      <h2>Anfragen in diesem Workspace</h2>
-      <p v-if="loading" class="muted">Laden…</p>
-      <p v-else-if="requests.length === 0" class="muted">Noch keine Anfragen.</p>
+      <h2>{{ t("request.listTitle") }}</h2>
+      <p v-if="loading" class="muted">{{ t("common.loading") }}</p>
+      <p v-else-if="requests.length === 0" class="muted">{{ t("request.empty") }}</p>
       <div class="table-wrap" v-else><table class="table">
         <thead>
           <tr>
-            <th>Produkt</th>
-            <th>Menge</th>
-            <th>Status</th>
-            <th>Anfragender</th>
-            <th>Erstellt</th>
+            <th>{{ t("common.product") }}</th>
+            <th>{{ t("common.quantity") }}</th>
+            <th>{{ t("common.status") }}</th>
+            <th>{{ t("request.requester") }}</th>
+            <th>{{ t("common.date") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -96,7 +96,7 @@ onMounted(async () => {
     await loadProducts();
     await loadRequests();
   } catch (e) {
-    listError.value = e instanceof Error ? e.message : "Laden fehlgeschlagen";
+    listError.value = e instanceof Error ? e.message : t("common.loadFailed");
   } finally {
     loading.value = false;
   }
@@ -104,7 +104,7 @@ onMounted(async () => {
 
 async function loadProducts() {
   const res = await apiFetch("/api/products");
-  if (!res.ok) throw new Error("Produkte konnten nicht geladen werden");
+  if (!res.ok) throw new Error(t("request.productsLoadFailed"));
   products.value = await res.json();
 }
 
@@ -117,8 +117,8 @@ async function loadRequests() {
 async function submit() {
   successMsg.value = "";
   errorMsg.value = "";
-  if (!form.value.productId) { errorMsg.value = "Produkt auswählen."; return; }
-  if (!form.value.quantity || form.value.quantity < 1) { errorMsg.value = "Menge muss eine positive ganze Zahl sein."; return; }
+  if (!form.value.productId) { errorMsg.value = t("request.selectProductError"); return; }
+  if (!form.value.quantity || form.value.quantity < 1) { errorMsg.value = t("request.quantityError"); return; }
   submitting.value = true;
   try {
     const res = await apiFetch("/api/requests", {
@@ -131,14 +131,14 @@ async function submit() {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      errorMsg.value = tApi((data && data.error) || `Request failed (HTTP ${res.status})`);
+      errorMsg.value = tApi((data && data.error) || `${t("common.error")} (HTTP ${res.status})`);
       return;
     }
-    successMsg.value = `Anfrage erstellt (${String(data.id).slice(0, 8)}…)`;
+    successMsg.value = `${t("request.created")} (${String(data.id).slice(0, 8)}…)`;
     form.value = { productId: "", quantity: 1, justification: "" };
     await loadRequests();
   } catch (e) {
-    errorMsg.value = e instanceof Error ? e.message : "Netzwerkfehler";
+    errorMsg.value = e instanceof Error ? e.message : t("common.networkError");
   } finally {
     submitting.value = false;
   }
