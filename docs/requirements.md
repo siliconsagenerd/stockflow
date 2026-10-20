@@ -45,3 +45,15 @@
 - Concurrent approve/reject yields one consistent final state.
 - GET /api/purchase-orders and GET /api/purchase-orders/{id} scoped to session workspace; cross-workspace returns 404.
 - Transaction alone is NOT sufficient for concurrent safety; the conditional status transition (ExecuteUpdate with WHERE status='Pending') plus the unique constraint on PurchaseOrder.PurchaseRequestId are the actual guards.
+
+### Phase 4 (goods receipt, stock, idempotency, concurrency)
+12. As a Warehouse (demo identity), I can receive goods against an eligible PO with a positive whole-number quantity.
+13. As a visitor, I can see workspace-specific stock balances and movement history.
+## Acceptance criteria (Phase 4)
+- POST /api/purchase-orders/{id}/receive requires valid session + Warehouse identity; order must belong to workspace and be eligible (Open/PartiallyReceived).
+- Quantity must be positive integer <= outstanding; over-receipt and completed-order receipts rejected.
+- Receipt atomically creates GoodsReceipt, updates order received/status, updates StockBalance, creates StockMovement. Rollback on any failure.
+- Idempotency: same (workspace, key) + same payload returns original; conflicting payload rejected; concurrent duplicates produce one receipt.
+- Concurrency: conditional transitions + Serializable isolation; bounded 409 on conflict.
+- StockBalance unique (WorkspaceId, ProductId, WarehouseId); zero opening balances (no seed stock movements).
+- GET /api/inventory and GET /api/stock-movements scoped to session workspace.

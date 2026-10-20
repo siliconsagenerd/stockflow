@@ -20,6 +20,10 @@ public class RequestCreationTests : IClassFixture<StockFlowWebApplicationFactory
     {
         using var db = _factory.CreateDbContext();
         db.Database.Migrate();
+        db.StockMovements.RemoveRange(db.StockMovements);
+        db.StockBalances.RemoveRange(db.StockBalances);
+        db.GoodsReceipts.RemoveRange(db.GoodsReceipts);
+        db.PurchaseOrders.RemoveRange(db.PurchaseOrders);
         db.PurchaseRequests.RemoveRange(db.PurchaseRequests);
         db.DemoSessions.RemoveRange(db.DemoSessions);
         db.DemoWorkspaces.RemoveRange(db.DemoWorkspaces);

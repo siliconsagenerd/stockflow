@@ -21,3 +21,10 @@ Two-minute script (to be finalized after features land):
 6. Reload page — order persists.
 7. Create another request as Employee, switch to Manager, click Reject with a reason — request marked Rejected, no order created.
 8. Non-Manager identities see Switch to a Manager identity guidance; approve/reject buttons hidden.
+
+## Phase 4 walkthrough
+1. Employee creates request for 10 units, Manager approves → PO (Open, 10 ordered).
+2. Switch to Werner (Warehouse). Open PO detail. Receive 6 → PartiallyReceived, stock +6.
+3. Receive remaining 4 → Completed, stock +10.
+4. Check Inventory → 10 pcs, movement history shows +6 and +4.
+5. Reload → state persists.

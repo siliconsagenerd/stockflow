@@ -3,7 +3,8 @@ import Overview from "../views/Overview.vue";
 import Requests from "../views/Requests.vue";
 import Approvals from "../views/Approvals.vue";
 import Orders from "../views/Orders.vue";
-import Placeholder from "../views/Placeholder.vue";
+import OrderDetail from "../views/OrderDetail.vue";
+import Inventory from "../views/Inventory.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -12,7 +13,8 @@ const router = createRouter({
     { path: "/requests", name: "requests", component: Requests },
     { path: "/approvals", name: "approvals", component: Approvals },
     { path: "/orders", name: "orders", component: Orders },
-    { path: "/inventory", name: "inventory", component: Placeholder },
+    { path: "/orders/:id", name: "order-detail", component: OrderDetail },
+    { path: "/inventory", name: "inventory", component: Inventory },
   ],
 });
 

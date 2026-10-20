@@ -17,6 +17,7 @@ public class StockFlowDbContext : DbContext
     public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
     public DbSet<GoodsReceipt> GoodsReceipts => Set<GoodsReceipt>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+    public DbSet<StockBalance> StockBalances => Set<StockBalance>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,7 +25,8 @@ public class StockFlowDbContext : DbContext
 
         modelBuilder.Entity<Product>().HasIndex(p => p.Sku).IsUnique();
         modelBuilder.Entity<PurchaseOrder>().HasIndex(o => o.PurchaseRequestId).IsUnique();
-        modelBuilder.Entity<GoodsReceipt>().HasIndex(g => g.IdempotencyKey).IsUnique();
+        modelBuilder.Entity<GoodsReceipt>().HasIndex(g => new { g.WorkspaceId, g.IdempotencyKey }).IsUnique();
+        modelBuilder.Entity<StockBalance>().HasIndex(b => new { b.WorkspaceId, b.ProductId, b.WarehouseId }).IsUnique();
 
         modelBuilder.Entity<Product>()
             .HasOne(p => p.PreferredSupplier).WithMany()
@@ -33,7 +35,6 @@ public class StockFlowDbContext : DbContext
         modelBuilder.Entity<DemoSession>()
             .HasOne(s => s.Workspace).WithMany().HasForeignKey(s => s.WorkspaceId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<DemoSession>().HasIndex(s => s.TokenHash).IsUnique();
-
 
         modelBuilder.Entity<PurchaseRequest>()
             .HasOne(r => r.Workspace).WithMany().HasForeignKey(r => r.WorkspaceId).OnDelete(DeleteBehavior.Cascade);
@@ -52,13 +53,24 @@ public class StockFlowDbContext : DbContext
             .HasOne(o => o.Warehouse).WithMany().HasForeignKey(o => o.WarehouseId).OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<GoodsReceipt>()
+            .HasOne(g => g.Workspace).WithMany().HasForeignKey(g => g.WorkspaceId).OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<GoodsReceipt>()
             .HasOne(g => g.PurchaseOrder).WithMany().HasForeignKey(g => g.PurchaseOrderId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<GoodsReceipt>()
             .HasOne(g => g.ReceivedBy).WithMany().HasForeignKey(g => g.ReceivedById).OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<StockMovement>()
+            .HasOne(m => m.Workspace).WithMany().HasForeignKey(m => m.WorkspaceId).OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<StockMovement>()
             .HasOne(m => m.Product).WithMany().HasForeignKey(m => m.ProductId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<StockMovement>()
             .HasOne(m => m.Warehouse).WithMany().HasForeignKey(m => m.WarehouseId).OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<StockBalance>()
+            .HasOne(b => b.Workspace).WithMany().HasForeignKey(b => b.WorkspaceId).OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<StockBalance>()
+            .HasOne(b => b.Product).WithMany().HasForeignKey(b => b.ProductId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<StockBalance>()
+            .HasOne(b => b.Warehouse).WithMany().HasForeignKey(b => b.WarehouseId).OnDelete(DeleteBehavior.Restrict);
     }
 }

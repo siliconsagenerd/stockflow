@@ -1,8 +1,9 @@
 namespace StockFlow.Api.Models;
-
 public class GoodsReceipt
 {
     public Guid Id { get; set; }
+    public Guid WorkspaceId { get; set; }
+    public DemoWorkspace Workspace { get; set; } = null!;
     public Guid PurchaseOrderId { get; set; }
     public PurchaseOrder PurchaseOrder { get; set; } = null!;
     public int Quantity { get; set; }

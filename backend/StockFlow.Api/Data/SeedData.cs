@@ -31,19 +31,6 @@ public static class SeedData
         };
         db.Products.AddRange(products);
 
-        foreach (var p in products.Where(p => p.CurrentStock > 0))
-        {
-            db.StockMovements.Add(new StockMovement
-            {
-                Id = Guid.NewGuid(),
-                ProductId = p.Id,
-                WarehouseId = warehouse.Id,
-                Delta = p.CurrentStock,
-                Reason = "Initial seed stock",
-                CreatedAt = DateTime.UtcNow
-            });
-        }
-
         await db.SaveChangesAsync();
     }
 }

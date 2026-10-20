@@ -61,3 +61,10 @@ MSB3277: EF Core 10.0.13 vs Npgsql 10.0.3 transitive EF Core Relational 10.0.4 (
 - Concurrency: conditional ExecuteUpdateAsync with WHERE status='Pending' (rows==0 → 409) + unique constraint on PurchaseOrder.PurchaseRequestId. Transaction alone is insufficient; the conditional transition and unique constraint are the actual guards.
 - Approval derives supplier (product.PreferredSupplierId), warehouse (first seeded warehouse), product, quantity from trusted stored records.
 - Rejection reason bounded to 500 chars.
+
+## Phase 4 — Goods Receipt & Stock
+- Endpoints: POST /api/purchase-orders/{id}/receive, GET /api/inventory, GET /api/stock-movements.
+- StockBalance: unique (WorkspaceId, ProductId, WarehouseId); zero opening balances (no seed stock movements).
+- Concurrency: Serializable isolation + conditional updates; 409 on serialization failure or unique violation.
+- Idempotency: GoodsReceipt unique (WorkspaceId, IdempotencyKey); same key+payload returns original; conflicting key rejected.
+- Opening stock policy: zero opening balances; all stock enters via goods receipts. No duplicate on reload/restart.

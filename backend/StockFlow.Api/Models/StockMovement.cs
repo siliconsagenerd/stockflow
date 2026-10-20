@@ -1,8 +1,9 @@
 namespace StockFlow.Api.Models;
-
 public class StockMovement
 {
     public Guid Id { get; set; }
+    public Guid WorkspaceId { get; set; }
+    public DemoWorkspace Workspace { get; set; } = null!;
     public Guid ProductId { get; set; }
     public Product Product { get; set; } = null!;
     public Guid WarehouseId { get; set; }

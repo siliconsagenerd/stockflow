@@ -19,7 +19,7 @@
         </thead>
         <tbody>
           <tr v-for="o in orders" :key="o.id">
-            <td>{{ o.reference }}</td>
+            <td><router-link :to="`/orders/${o.id}`">{{ o.reference }}</router-link></td>
             <td>{{ o.productName }} <span class="muted">({{ o.productSku }})</span></td>
             <td>{{ o.supplierName }}</td>
             <td>{{ o.orderedQuantity }}</td>
