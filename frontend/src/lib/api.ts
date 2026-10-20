@@ -1,9 +1,12 @@
+import { ref } from "vue";
 const IDENTITY_KEY = "stockflow.demoUserId";
-
+// reactive so identity switches update computeds (isManager) without a reload
+const demoUserId = ref<string | null>(localStorage.getItem(IDENTITY_KEY));
 export function getDemoUserId(): string | null {
-  return localStorage.getItem(IDENTITY_KEY);
+  return demoUserId.value;
 }
 export function setDemoUserId(id: string) {
+  demoUserId.value = id;
   localStorage.setItem(IDENTITY_KEY, id);
 }
 

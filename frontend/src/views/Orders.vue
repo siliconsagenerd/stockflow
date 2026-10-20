@@ -6,7 +6,7 @@
     <div class="card">
       <p v-if="loading" class="muted">Laden…</p>
       <p v-else-if="orders.length === 0" class="muted">Noch keine Bestellungen.</p>
-      <table v-else class="table">
+      <div class="table-wrap" v-else><table class="table">
         <thead>
           <tr>
             <th>Referenz</th>
@@ -23,11 +23,11 @@
             <td>{{ o.productName }} <span class="muted">({{ o.productSku }})</span></td>
             <td>{{ o.supplierName }}</td>
             <td>{{ o.orderedQuantity }}</td>
-            <td><span class="status-badge status-pending">{{ o.status }}</span></td>
+            <td><span class="status-badge status-pending">{{ tStatus(o.status) }}</span></td>
             <td>{{ new Date(o.createdAt).toLocaleString() }}</td>
           </tr>
         </tbody>
-      </table>
+      </table></div>
     </div>
     <p v-if="error" class="status-badge status-danger">{{ error }}</p>
   </section>
@@ -42,17 +42,17 @@ interface OrderRow { id: string; reference: string; purchaseRequestId: string; s
 
 const orders = ref<OrderRow[]>([]);
 const loading = ref(true);
-const { t } = useI18n();
+const { t, tStatus } = useI18n();
 const error = ref("");
 
 onMounted(async () => {
   try {
     await ensureSession();
     const res = await apiFetch("/api/purchase-orders");
-    if (!res.ok) throw new Error("Failed to load orders");
+    if (!res.ok) throw new Error("Bestellungen konnten nicht geladen werden");
     orders.value = await res.json();
   } catch (e) {
-    error.value = e instanceof Error ? e.message : "Failed to load";
+    error.value = e instanceof Error ? e.message : "Laden fehlgeschlagen";
   } finally {
     loading.value = false;
   }

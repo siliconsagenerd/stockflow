@@ -1,7 +1,7 @@
 <template>
   <section>
     <p><router-link to="/orders">← Zurück zu Bestellungen</router-link></p>
-    <h1>Purchase Order {{ order?.reference }}</h1>
+    <h1>Bestellung {{ order?.reference }}</h1>
     <p v-if="loading" class="muted">Laden…</p>
     <p v-if="error" class="status-badge status-danger">{{ error }}</p>
 
@@ -12,7 +12,7 @@
       <div>Bestellt: {{ order.orderedQuantity }}</div>
       <div>Empfangen: {{ order.receivedQuantity }}</div>
       <div>Ausstehend: {{ order.orderedQuantity - order.receivedQuantity }}</div>
-      <div>Status: <span class="status-badge status-pending">{{ order.status }}</span></div>
+      <div>Status: <span class="status-badge status-pending">{{ tStatus(order.status) }}</span></div>
       <div>Erstellt: {{ new Date(order.createdAt).toLocaleString() }}</div>
     </div>
 
@@ -29,7 +29,7 @@
     <div class="card">
       <h2>Wareneingangshistorie</h2>
       <p v-if="receipts.length === 0" class="muted">Noch keine Wareneingänge.</p>
-      <table v-else class="table">
+      <div class="table-wrap" v-else><table class="table">
         <thead><tr><th>Zeit</th><th>Menge</th><th>Benutzer</th><th>Idempotenzschlüssel</th></tr></thead>
         <tbody>
           <tr v-for="r in receipts" :key="r.id">
@@ -39,7 +39,7 @@
             <td class="muted">{{ r.idempotencyKey }}</td>
           </tr>
         </tbody>
-      </table>
+      </table></div>
     </div>
   </section>
 </template>
@@ -47,6 +47,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { useI18n } from "../lib/i18n";
 import { apiFetch, ensureSession } from "../lib/api";
 
 interface Order { id: string; reference: string; purchaseRequestId: string; supplierId: string; supplierName: string; warehouseId: string; warehouseName: string; productId: string; productName: string; productSku: string; orderedQuantity: number; receivedQuantity: number; status: string; createdAt: string; }
@@ -58,6 +59,7 @@ const receipts = ref<Receipt[]>([]);
 const loading = ref(true);
 const error = ref("");
 const qty = ref(1);
+const { tStatus } = useI18n();
 const busy = ref(false);
 const msg = ref("");
 const msgOk = ref(true);
@@ -68,7 +70,7 @@ onMounted(async () => {
     await ensureSession();
     await load();
   } catch (e) {
-    error.value = e instanceof Error ? e.message : "Failed to load";
+    error.value = e instanceof Error ? e.message : "Laden fehlgeschlagen";
   } finally {
     loading.value = false;
   }
@@ -77,8 +79,10 @@ onMounted(async () => {
 async function load() {
   const id = route.params.id as string;
   const r = await apiFetch(`/api/purchase-orders/${id}`);
-  if (!r.ok) { error.value = "Not found"; return; }
+  if (!r.ok) { error.value = "Nicht gefunden"; return; }
   order.value = await r.json();
+  const rr = await apiFetch(`/api/purchase-orders/${id}/receipts`);
+  if (rr.ok) receipts.value = await rr.json();
   // receipts: fetch from movements? We'll keep a local list; reload not available, so fetch all receipts via a simple approach: none endpoint. Show empty for now.
 }
 
@@ -93,21 +97,21 @@ async function receive() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       if (res.status === 409) {
-        msg.value = (data && data.error) || "Conflict - please retry.";
+        msg.value = (data && data.error) || "Konflikt – bitte erneut versuchen.";
       } else {
-        msg.value = (data && data.error) || ("Failed (HTTP " + res.status + ")");
+        msg.value = (data && data.error) || ("Fehler (HTTP " + res.status + ")");
       }
       msgOk.value = false;
       return;
     }
-    msg.value = "Empfangend";
+    msg.value = "Erfolgreich erfasst";
     msgOk.value = true;
     // update order + generate new key for next receipt
     await load();
     idempotencyKey.value = crypto.randomUUID();
     qty.value = 1;
   } catch (e) {
-    msg.value = e instanceof Error ? e.message : "Network error";
+    msg.value = e instanceof Error ? e.message : "Netzwerkfehler";
     msgOk.value = false;
   } finally {
     busy.value = false;

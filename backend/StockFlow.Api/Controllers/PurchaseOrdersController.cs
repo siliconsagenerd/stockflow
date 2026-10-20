@@ -61,6 +61,29 @@ public class PurchaseOrdersController : ControllerBase
         return Ok(o);
     }
 
+    [HttpGet("{id:guid}/receipts")]
+    public async Task<IActionResult> GetReceipts(Guid id)
+    {
+        var (session, err) = await ResolveSessionAsync();
+        if (err is not null) return err;
+        var wsId = session!.WorkspaceId;
+
+        var exists = await _db.PurchaseOrders
+            .AnyAsync(x => x.Id == id && x.PurchaseRequest.WorkspaceId == wsId);
+        if (!exists) return NotFound(new { error = "Purchase order not found." });
+
+        var list = await _db.GoodsReceipts
+            .Where(g => g.PurchaseOrderId == id && g.WorkspaceId == wsId)
+            .OrderBy(g => g.ReceivedAt)
+            .Select(g => new ReceiptResponseDto(
+                g.Id, g.PurchaseOrderId, g.WorkspaceId, g.Quantity,
+                g.ReceivedById, g.ReceivedBy.DisplayName, g.ReceivedAt, g.IdempotencyKey,
+                g.PurchaseOrder.ReceivedQuantity, g.PurchaseOrder.Status))
+            .ToListAsync();
+
+        return Ok(list);
+    }
+
     [HttpPost("{id:guid}/receive")]
     public async Task<IActionResult> Receive(Guid id, [FromBody] ReceiveRequestDto dto)
     {

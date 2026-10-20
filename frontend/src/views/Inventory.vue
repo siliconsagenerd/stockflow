@@ -7,7 +7,7 @@
       <h2>Bestände</h2>
       <p v-if="loading" class="muted">Laden…</p>
       <p v-else-if="balances.length === 0" class="muted">Noch keine Bestände.</p>
-      <table v-else class="table">
+      <div class="table-wrap" v-else><table class="table">
         <thead>
           <tr><th>Produkt</th><th>Lager</th><th>Menge</th></tr>
         </thead>
@@ -18,15 +18,15 @@
             <td>{{ b.quantity }} {{ b.productUnit }}</td>
           </tr>
         </tbody>
-      </table>
+      </table></div>
     </div>
 
     <div class="card">
       <h2>Bewegungshistorie</h2>
       <p v-if="movements.length === 0" class="muted">Noch keine Bewegungen.</p>
-      <table v-else class="table">
+      <div class="table-wrap" v-else><table class="table">
         <thead>
-          <tr><th>Time</th><th>Produkt</th><th>Delta</th><th>Reason</th><th>Reference</th></tr>
+          <tr><th>Zeit</th><th>Produkt</th><th>Änderung</th><th>Grund</th><th>Referenz</th></tr>
         </thead>
         <tbody>
           <tr v-for="m in movements" :key="m.id">
@@ -37,7 +37,7 @@
             <td class="muted">{{ m.referenceId ?? '—' }}</td>
           </tr>
         </tbody>
-      </table>
+      </table></div>
     </div>
     <p v-if="error" class="status-badge status-danger">{{ error }}</p>
   </section>
@@ -63,7 +63,7 @@ onMounted(async () => {
     const b = await apiFetch("/api/inventory"); if (b.ok) balances.value = await b.json();
     const m = await apiFetch("/api/stock-movements"); if (m.ok) movements.value = await m.json();
   } catch (e) {
-    error.value = e instanceof Error ? e.message : "Failed to load";
+    error.value = e instanceof Error ? e.message : "Laden fehlgeschlagen";
   } finally {
     loading.value = false;
   }

@@ -38,26 +38,26 @@
       <h2>Anfragen in diesem Workspace</h2>
       <p v-if="loading" class="muted">Laden…</p>
       <p v-else-if="requests.length === 0" class="muted">Noch keine Anfragen.</p>
-      <table v-else class="table">
+      <div class="table-wrap" v-else><table class="table">
         <thead>
           <tr>
-            <th>Product</th>
-            <th>Qty</th>
+            <th>Produkt</th>
+            <th>Menge</th>
             <th>Status</th>
-            <th>Requester</th>
-            <th>Created</th>
+            <th>Anfragender</th>
+            <th>Erstellt</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="r in requests" :key="r.id">
             <td>{{ r.productName }} <span class="muted">({{ r.productSku }})</span></td>
             <td>{{ r.quantity }} {{ r.productUnit }}</td>
-            <td><span class="status-badge status-pending">{{ r.status }}</span></td>
+            <td><span class="status-badge status-pending">{{ tStatus(r.status) }}</span></td>
             <td>{{ r.requesterName }}</td>
             <td>{{ new Date(r.createdAt).toLocaleString() }}</td>
           </tr>
         </tbody>
-      </table>
+      </table></div>
       <p v-if="listError" class="status-badge status-danger">{{ listError }}</p>
     </div>
   </section>
@@ -80,7 +80,7 @@ const requests = ref<RequestRow[]>([]);
 const loading = ref(true);
 const listError = ref("");
 const submitting = ref(false);
-const { t } = useI18n();
+const { t, tStatus } = useI18n();
 const successMsg = ref("");
 const errorMsg = ref("");
 
@@ -96,7 +96,7 @@ onMounted(async () => {
     await loadProducts();
     await loadRequests();
   } catch (e) {
-    listError.value = e instanceof Error ? e.message : "Failed to load";
+    listError.value = e instanceof Error ? e.message : "Laden fehlgeschlagen";
   } finally {
     loading.value = false;
   }
@@ -104,13 +104,13 @@ onMounted(async () => {
 
 async function loadProducts() {
   const res = await apiFetch("/api/products");
-  if (!res.ok) throw new Error("Failed to load products");
+  if (!res.ok) throw new Error("Produkte konnten nicht geladen werden");
   products.value = await res.json();
 }
 
 async function loadRequests() {
   const res = await apiFetch("/api/requests");
-  if (!res.ok) throw new Error("Failed to load requests");
+  if (!res.ok) throw new Error("Anfragen konnten nicht geladen werden");
   requests.value = await res.json();
 }
 
@@ -134,11 +134,11 @@ async function submit() {
       errorMsg.value = (data && data.error) || `Request failed (HTTP ${res.status})`;
       return;
     }
-    successMsg.value = `Request created (${String(data.id).slice(0, 8)}…)`;
+    successMsg.value = `Anfrage erstellt (${String(data.id).slice(0, 8)}…)`;
     form.value = { productId: "", quantity: 1, justification: "" };
     await loadRequests();
   } catch (e) {
-    errorMsg.value = e instanceof Error ? e.message : "Network error";
+    errorMsg.value = e instanceof Error ? e.message : "Netzwerkfehler";
   } finally {
     submitting.value = false;
   }

@@ -40,7 +40,7 @@
       <p v-if="!overview?.recentActivity?.length" class="muted">Noch keine Aktivität. Erstellen Sie eine Anfrage.</p>
       <ul v-else class="activity">
         <li v-for="(a, i) in overview.recentActivity" :key="i">
-          <span class="muted">{{ new Date(a.at).toLocaleString() }}</span> — {{ a.label }} <span class="status-badge status-ok">{{ a.status }}</span>
+          <span class="muted">{{ new Date(a.at).toLocaleString() }}</span> — {{ a.label }} <span class="status-badge status-ok">{{ tStatus(a.status) }}</span>
         </li>
       </ul>
     </div>
@@ -54,7 +54,7 @@
 import { ref, onMounted } from "vue";
 import { apiFetch, ensureSession } from "../lib/api";
 import { useI18n } from "../lib/i18n";
-const { t } = useI18n();
+const { t, tStatus } = useI18n();
 const overview = ref<any>(null);
 const loading = ref(true);
 const error = ref("");
@@ -62,10 +62,10 @@ onMounted(async () => {
   try {
     await ensureSession();
     const res = await apiFetch("/api/overview");
-    if (!res.ok) throw new Error("Failed to load overview");
+    if (!res.ok) throw new Error("Übersicht konnte nicht geladen werden");
     overview.value = await res.json();
   } catch (e) {
-    error.value = e instanceof Error ? e.message : "Failed to load";
+    error.value = e instanceof Error ? e.message : "Laden fehlgeschlagen";
   } finally {
     loading.value = false;
   }

@@ -1,7 +1,7 @@
 <template>
   <section>
     <h1>{{ title }}</h1>
-    <p class="muted">This screen is implemented in a later vertical slice.</p>
+    <p class="muted">Dieser Bildschirm wird in einem späteren Umsetzungsschritt implementiert.</p>
     <p><router-link to="/">← Back to overview</router-link></p>
   </section>
 </template>

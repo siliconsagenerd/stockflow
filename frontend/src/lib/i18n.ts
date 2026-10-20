@@ -9,12 +9,14 @@ export function useI18n() {
     const dict = locale.value === "de" ? de : en;
     return dict[key] ?? key;
   };
+  // translate backend status values; falls back to raw value
+  const tStatus = (status: string): string => t("status." + status);
   const setLocale = (l: Locale) => {
     locale.value = l;
     localStorage.setItem("stockflow.locale", l);
   };
   const toggle = () => setLocale(locale.value === "de" ? "en" : "de");
-  return { locale, t, setLocale, toggle };
+  return { locale, t, tStatus, setLocale, toggle };
 }
 
 const de: Record<string, string> = {
@@ -62,6 +64,12 @@ const de: Record<string, string> = {
   "order.receive4": "4 empfangen",
   "inventory.balance": "Bestand",
   "inventory.movements": "Bewegungen",
+  "status.Pending": "Ausstehend",
+  "status.Approved": "Freigegeben",
+  "status.Rejected": "Abgelehnt",
+  "status.Open": "Offen",
+  "status.PartiallyReceived": "Teilweise empfangen",
+  "status.Completed": "Abgeschlossen",
   "health.connected": "Verbunden",
   "health.unreachable": "Nicht erreichbar",
 };
@@ -111,6 +119,12 @@ const en: Record<string, string> = {
   "order.receive4": "Receive 4",
   "inventory.balance": "Stock",
   "inventory.movements": "Movements",
+  "status.Pending": "Pending",
+  "status.Approved": "Approved",
+  "status.Rejected": "Rejected",
+  "status.Open": "Open",
+  "status.PartiallyReceived": "Partially received",
+  "status.Completed": "Completed",
   "health.connected": "Connected",
   "health.unreachable": "Unreachable",
 };
