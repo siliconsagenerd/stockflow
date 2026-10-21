@@ -12,7 +12,7 @@
 - **Deployment date**: 2026-10-20
 - **Frontend**: Vercel (hobby plan)
 - **API host**: Oracle Cloud (eu-frankfurt-1, VM.Standard.A1.Flex)
-- **Database**: Supabase Postgres (eu-central-1, project ref djzuraoldeuzoesmodsl)
+- **Database**: Supabase Postgres (eu-central-1; project ref redacted — see private ops notes)
 
 ## Health Check
 ```bash
@@ -24,27 +24,27 @@ curl -s https://stockflowap1.duckdns.org/health
 
 ### Container logs
 ```bash
-ssh -i ~/.ssh/oci_stockflow ubuntu@138.3.249.173 "sudo docker logs stockflow-api --tail 50"
+ssh -i <private-key> ubuntu@<oci-host> "sudo docker logs stockflow-api --tail 50"
 ```
 
 ### Caddy logs
 ```bash
-ssh -i ~/.ssh/oci_stockflow ubuntu@138.3.249.173 "sudo journalctl -u caddy --no-pager -n 50"
+ssh -i <private-key> ubuntu@<oci-host> "sudo journalctl -u caddy --no-pager -n 50"
 ```
 
 ### Follow logs in real time
 ```bash
-ssh -i ~/.ssh/oci_stockflow ubuntu@138.3.249.173 "sudo docker logs -f stockflow-api"
+ssh -i <private-key> ubuntu@<oci-host> "sudo docker logs -f stockflow-api"
 ```
 
 ## Redeploy Same Version
 ```bash
 # 1. Sync source from oldmac (OCI dir is NOT a git repo — git pull fails there)
 cd ~/projects/stockflow && tar czf - backend Dockerfile | \
-  ssh -i ~/.ssh/oci_stockflow ubuntu@138.3.249.173 "cd /home/ubuntu/stockflow && tar xzf -"
+  ssh -i <private-key> ubuntu@<oci-host> "cd /home/ubuntu/stockflow && tar xzf -"
 
 # 2. On OCI instance:
-ssh -i ~/.ssh/oci_stockflow ubuntu@138.3.249.173
+ssh -i <private-key> ubuntu@<oci-host>
 cd /home/ubuntu/stockflow && sudo docker build -q -t stockflow-api:latest .
 sudo docker stop stockflow-api && sudo docker rm stockflow-api
 sudo docker run -d --name stockflow-api --restart unless-stopped \
@@ -73,7 +73,7 @@ sudo docker run -d --name stockflow-api --restart unless-stopped \
 
 ## Supabase Backup/Restore
 - **Free tier retention**: 7 days (daily backups)
-- **Manual backup**: `supabase db dump --project-ref djzuraoldeuzoesmodsl`
+- **Manual backup**: `supabase db dump --project-ref <project-ref>`
 - **Restore**: Contact Supabase support or use `pg_restore` with a dump file
 - **Note**: Do not run destructive resets against production
 

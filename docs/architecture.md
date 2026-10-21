@@ -48,7 +48,7 @@ Returns 200 Healthy / 503 Unhealthy with JSON body.
 ## Dev networking
 - API: oldmac 127.0.0.1:5050
 - Vite: oldmac 127.0.0.1:5173 (loopback only; M2 via SSH tunnel)
-- Postgres: oldmac 192.168.3.146:5432 (existing container, dedicated DB/role)
+- Postgres: private host (oldmac) container, dedicated DB/role (host not published)
 - M2 access: `ssh -f -N -L 5173:127.0.0.1:5173 -L 5050:127.0.0.1:5050 oldmac`
 
 ## Known limitation
