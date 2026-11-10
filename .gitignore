@@ -30,3 +30,5 @@ Thumbs.db
 publish/
 # TS build info
 *.tsbuildinfo
+.env*
+.memory-symlink-target.bak
