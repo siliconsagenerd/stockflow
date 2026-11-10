@@ -15,6 +15,10 @@ history. Built for the dinext Working Student Developer application.
 Live demo: https://stockflow-frontend-mauve.vercel.app/
 Demo identities are simulated, not real authentication.
 
+An optional companion service, `services/ai-purchasing`, scores pending requests
+and shows the result next to each one. It only reads; approval stays in the main
+app.
+
 ```mermaid
 flowchart LR
     subgraph Browser
@@ -30,10 +34,14 @@ flowchart LR
     subgraph Data
         P[(Supabase Postgres)]
     end
+    subgraph Assistant [optional]
+        A[Approval assistant<br/>Node + React]
+    end
 
     U -->|HTTPS| V -->|rewrite /api| C
     C --> E --> P
     C -->|session cookie| U
+    A -.->|read-only SQL| P
 ```
 
 ## Features
@@ -47,6 +55,9 @@ flowchart LR
 - **Anonymous sessions:** HttpOnly cookie, SHA-256 hashed, 8h expiry
 - **Overview dashboard:** metrics, recent activity, demo guide
 - **Responsive UI:** desktop and mobile layouts
+- **Approval assistant (optional):** rule-based recommendation per pending
+  request, optional LLM second opinion, German/English UI
+  (`services/ai-purchasing`)
 
 ## Stack
 
@@ -56,7 +67,17 @@ flowchart LR
 | Frontend | Vue 3 + TypeScript (Vite) |
 | Database | PostgreSQL 16 (Supabase) |
 | Tests | xUnit (integration, real Postgres), Playwright (browser) |
+| Assistant | Node 20+, TypeScript, Express, React 19, Tailwind 4 (`services/ai-purchasing`) |
 | Deploy | Vercel (frontend), Oracle Cloud (API), Supabase (DB) |
+
+## Repository Layout
+
+```
+backend/                ASP.NET Core API, EF Core, xUnit tests
+frontend/               Vue 3 + TypeScript SPA
+services/ai-purchasing/ Optional approval assistant (Node, React, own README)
+docs/                   Runbook and supporting documents
+```
 
 ## Local Development
 
@@ -83,6 +104,19 @@ npm run dev
 
 Open http://127.0.0.1:5173 (Vite proxies `/api` and `/health` to the API).
 
+### Approval assistant (optional)
+
+```bash
+cd services/ai-purchasing
+npm install
+npm run demo        # seeded demo data on http://127.0.0.1:8099
+```
+
+Without `DEMO_MODE=1` the service reads pending requests from `DATABASE_URL`
+(default `postgres://stockflow:...@127.0.0.1:5432/stockflow`) with read-only SQL.
+Set `GEMINI_API_KEY` or `OPENAI_API_KEY` to add an LLM second opinion; without a
+key it runs on rules alone. Details: `services/ai-purchasing/README.md`.
+
 ### Tests
 
 ```bash
@@ -97,6 +131,14 @@ Frontend build:
 
 ```bash
 cd frontend && npm run build
+```
+
+Approval assistant:
+
+```bash
+cd services/ai-purchasing
+npm test            # 13 tests, node:test, demo mode, no database needed
+npm run typecheck
 ```
 
 ## Architecture
@@ -163,7 +205,9 @@ against purchase orders. No manual stock adjustments or opening balances.
 ## Known Limitations
 
 - No real SAP/ERP integration.
-- No AI, no enterprise auth, no multi-warehouse, no transfers.
+- No AI in the core workflow; the optional assistant uses a rule engine with an
+  optional LLM second opinion and never writes.
+- No enterprise auth, no multi-warehouse, no transfers.
 - MSB3277 warning (EF Core/Npgsql version skew, tracked, not suppressed).
 - Supabase free tier (7-day backup retention, 500MB limit).
 - Oracle Cloud free tier (short-lived deployment).
@@ -173,6 +217,8 @@ against purchase orders. No manual stock adjustments or opening balances.
 ## Deployment Status
 
 Deployed 2026-10-20. Frontend on Vercel, API on Oracle Cloud, DB on Supabase.
+
+The approval assistant runs locally only; it has no deployment of its own.
 See `docs/RUNBOOK.md` for operational details.
 
 ## License
