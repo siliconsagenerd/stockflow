@@ -43,7 +43,13 @@ public class SessionsController : ControllerBase
             _db.DemoSessions.Remove(session);
             await _db.SaveChangesAsync();
         }
-        Response.Cookies.Delete(SessionContext.CookieName, new CookieOptions { Path = "/" });
+        Response.Cookies.Delete(SessionContext.CookieName, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = !_env.IsDevelopment(),
+            SameSite = SameSiteMode.Strict,
+            Path = "/"
+        });
         return NoContent();
     }
 }
