@@ -38,5 +38,5 @@ Employee / Manager / Warehouse operator — labelled "Demo identity — not secu
 - Authoritative repo: oldmac ~/projects/stockflow
 - M2: control/edit/browser machine
 - API + Vite dev server: oldmac (loopback)
-- PostgreSQL: oldmac container (192.168.3.146:5432), dedicated DB/role
+- PostgreSQL: private host (oldmac) container, dedicated DB/role (host not published)
 - M2 access via SSH tunnels only
