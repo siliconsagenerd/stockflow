@@ -405,3 +405,36 @@ button:focus-visible, a:focus-visible, select:focus-visible {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* status bar: inline the demo identity + connectivity */
+.status-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.status-bar .card {
+  margin-bottom: 0;
+  padding: 0.5rem 0.85rem;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+/* empty state + primary button */
+.empty-state { display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem; padding: 0.5rem 0; }
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: #fff;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.btn-primary:hover { background: var(--accent-hover); text-decoration: none; transform: translateY(-1px); }

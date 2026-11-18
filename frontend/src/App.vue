@@ -20,8 +20,10 @@
       </div>
     </header>
     <main class="app-main">
-      <DemoIdentitySwitcher />
-      <ConnectivityBadge />
+      <div class="status-bar">
+        <DemoIdentitySwitcher />
+        <ConnectivityBadge />
+      </div>
       <router-view v-slot="{ Component }">
         <transition name="page" mode="out-in">
           <component :is="Component" />

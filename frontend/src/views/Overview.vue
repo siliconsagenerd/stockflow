@@ -42,7 +42,10 @@
     </div>
     <div class="card">
       <h2>{{ t("overview.recentActivity") }}</h2>
-      <p v-if="!overview?.recentActivity?.length" class="muted">{{ t("overview.noActivity") }}</p>
+      <div v-if="!overview?.recentActivity?.length" class="empty-state">
+        <p class="muted">{{ t("overview.noActivity") }}</p>
+        <router-link to="/requests" class="btn-primary">{{ t("nav.requests") }} →</router-link>
+      </div>
       <ul v-else class="activity">
         <li v-for="(a, i) in overview.recentActivity" :key="i">
           <span class="muted">{{ new Date(a.at).toLocaleString() }}</span>, {{ a.label }} <span class="status-badge status-ok">{{ tStatus(a.status) }}</span>
