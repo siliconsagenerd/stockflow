@@ -11,7 +11,12 @@
         <li>{{ t("overview.step4") }}</li>
       </ol>
     </div>
-    <div v-if="loading" class="muted">{{ t("common.loading") }}</div>
+    <div v-if="loading" class="metrics">
+      <div v-for="n in 5" :key="n" class="metric card">
+        <div class="skeleton metric-value">&nbsp;</div>
+        <div class="skeleton metric-label">&nbsp;</div>
+      </div>
+    </div>
     <p v-if="error" class="status-badge status-danger">{{ error }}</p>
     <div v-if="!loading" class="metrics">
       <router-link to="/requests" class="metric card">
