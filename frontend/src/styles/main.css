@@ -1,28 +1,28 @@
 :root {
-  --bg: #f2efe9;
+  --bg: #f8fafc;
   --surface: #ffffff;
-  --surface-2: #eae6df;
-  --text: #15130f;
-  --text-muted: #5c574f;
-  --accent: #c2410c;
-  --accent-hover: #9a3412;
-  --accent-soft: #fde6d8;
-  --pending: #a16207;
+  --surface-2: #f1f5f9;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --accent: #334155;
+  --accent-hover: #1e293b;
+  --accent-soft: #e2e8f0;
+  --pending: #b45309;
   --pending-soft: #fef3c7;
-  --success: #166534;
+  --success: #15803d;
   --success-soft: #dcfce7;
-  --danger: #991b1b;
+  --danger: #b91c1c;
   --danger-soft: #fee2e2;
-  --border: #d6d1c7;
-  --border-strong: #b8b2a6;
-  --radius: 4px;
-  --radius-sm: 2px;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --radius: 6px;
+  --radius-sm: 4px;
   --space: 1rem;
-  --font: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font: "Open Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --shadow-sm: 0 1px 0 rgba(21, 19, 15, 0.04);
-  --shadow: 0 8px 24px rgba(21, 19, 15, 0.08);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
 }
 
 * { box-sizing: border-box; }
