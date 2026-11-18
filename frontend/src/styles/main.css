@@ -30,7 +30,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
+  background: radial-gradient(1200px 600px at 80% -10%, rgba(56, 189, 248, 0.06), transparent 60%), var(--bg);
   color: var(--text);
   font-family: var(--font);
   font-size: 16px;
@@ -52,8 +52,8 @@ a:hover { color: var(--accent-hover); text-decoration: underline; text-underline
 .app-header, .app-main { min-width: 0; }
 
 .app-header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: #0f172a;
+  border-bottom: 1px solid #1e293b;
   padding: 0.6rem 1.25rem;
   display: flex;
   align-items: center;
@@ -63,7 +63,16 @@ a:hover { color: var(--accent-hover); text-decoration: underline; text-underline
   position: sticky;
   top: 0;
   z-index: 10;
+  color: #f8fafc;
 }
+
+.app-header .brand { color: #f8fafc; }
+.app-header .brand .muted { color: #94a3b8; }
+.app-header .nav a { color: #cbd5e1; }
+.app-header .nav a:hover { color: #f8fafc; background: #1e293b; }
+.app-header .nav a.router-link-active { color: #f8fafc; border-bottom-color: #38bdf8; }
+.app-header .lang-toggle { background: #1e293b; border-color: #334155; color: #f8fafc; }
+.app-header .lang-toggle:hover { background: #334155; border-color: #475569; }
 
 .brand {
   display: flex;
@@ -79,7 +88,7 @@ a:hover { color: var(--accent-hover); text-decoration: underline; text-underline
   width: 26px;
   height: 26px;
   border-radius: var(--radius-sm);
-  background: var(--accent);
+  background: #38bdf8;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -329,4 +338,47 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
     transition-duration: 0.01ms !important;
   }
   button:active { transform: none; }
+}
+
+/* --- motion + interaction --- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card, .metric {
+  animation: fadeInUp 0.35s ease-out both;
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.card, .metric { transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+
+:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+button:focus-visible, a:focus-visible, select:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .metric { animation: none; }
+  .card:hover { transform: none; }
+}
+
+/* alive: status pulse */
+@keyframes statusPulse {
+  0% { box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.35); }
+  70% { box-shadow: 0 0 0 6px rgba(21, 128, 61, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(21, 128, 61, 0); }
+}
+.status-badge.status-success {
+  animation: statusPulse 2s ease-out infinite;
 }
